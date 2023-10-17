@@ -10,4 +10,6 @@ module me.th4.effortlogger {
 
     opens me.th4.effortlogger to javafx.fxml;
     exports me.th4.effortlogger;
+    exports me.th4.effortlogger.controllers;
+    opens me.th4.effortlogger.controllers to javafx.fxml;
 }

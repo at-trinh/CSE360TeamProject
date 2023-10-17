@@ -1,29 +1,28 @@
-package me.th4.effortlogger;
+package me.th4.effortlogger.controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
 
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ResourceBundle;
 
-public class HelloController {
+public class HelloController implements Initializable {
     @FXML
-    private Label welcomeText;
-
-    @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-        try {
-            initDatabase();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private TableView<String> table = new TableView<String>();
 
     public void initDatabase() throws SQLException {
         String jdbcUrl = "jdbc:h2:./effortloggerdatabase";
         Connection connection = DriverManager.getConnection(jdbcUrl);
         System.out.println("Connected!");
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
     }
 }
