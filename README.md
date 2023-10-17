@@ -3,7 +3,7 @@
 - Aidan Lopez
 - Aldo Morales
 - Alexander Trinh
-- Asher Bennet is a nerd
+- Asher Bennett is a nerd
 - Kyle Whiting
 - Luis Lucas de la Cruz
 
