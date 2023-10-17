@@ -1,6 +1,6 @@
 # CSE 360 Team Project
 ## Team members:
-- Aidan Lopez
+- Aidan Lopez is a qt
 - Aldo Morales
 - Alexander Trinh
 - Asher Bennet
