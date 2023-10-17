@@ -1,9 +1,9 @@
 # CSE 360 Team Project
 ## Team members:
-- Aidan Lopez is a qt
+- Aidan Lopez
 - Aldo Morales
 - Alexander Trinh
-- Asher Bennet
+- Asher Bennet is a nerd
 - Kyle Whiting
 - Luis Lucas de la Cruz
 
