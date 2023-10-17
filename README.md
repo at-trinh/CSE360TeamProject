@@ -3,9 +3,9 @@
 - Aidan Lopez 
 - Aldo Morales
 - Alexander Trinh
-- Asher Bennett is a nerd
+- Asher Bennett
 - Kyle Whiting
-- Luis Lucas de la Cruz has a long nam
+- Luis Lucas de la Cruz
 
 ## Project Scope
 This project was to make an update to EffortLogger that supported new Agile planning techniques.
