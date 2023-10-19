@@ -1,4 +1,4 @@
-package me.th4.effortlogger.controllers;
+package me.thfour.effortlogger.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
