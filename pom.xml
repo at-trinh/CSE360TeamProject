@@ -39,6 +39,14 @@
             <artifactId>h2</artifactId>
             <version>2.2.224</version>
         </dependency>
+
+        <!-- Library responsible for custom components and theming -->
+        <!-- https://github.com/palexdev/MaterialFX -->
+        <dependency>
+            <groupId>io.github.palexdev</groupId>
+            <artifactId>materialfx</artifactId>
+            <version>11.16.1</version>
+        </dependency>
     </dependencies>
 
     <build>
