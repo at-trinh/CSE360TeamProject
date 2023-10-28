@@ -22,7 +22,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
 
-        <windows.upgrade.uuid>89a22750-6e35-11ee-b962-0242ac120002</windows.upgrade.uuid>
+        <windows.upgrade.uuid>994dbb14-7075-11ee-b962-0242ac120002</windows.upgrade.uuid>
         <!-- This is used to set many user-visible fields in the Windows Installer. See windows-jpackage.txt -->
         <windows.vendor>CSE_360_Thursday_04</windows.vendor>
 
@@ -46,6 +46,14 @@
             <groupId>io.github.palexdev</groupId>
             <artifactId>materialfx</artifactId>
             <version>11.16.1</version>
+        </dependency>
+
+        <!-- CSS Themeing -->
+        <!-- https://github.com/McFoggy/cssfx -->
+        <dependency>
+            <groupId>fr.brouillard.oss</groupId>
+            <artifactId>cssfx</artifactId>
+            <version>11.4.0</version>
         </dependency>
     </dependencies>
 
@@ -224,6 +232,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>3.2.0</version>
+                    <configuration>
+                        <nonFilteredFileExtensions>
+                            <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                        </nonFilteredFileExtensions>
+                    </configuration>
                 </plugin>
 
                 <plugin>
