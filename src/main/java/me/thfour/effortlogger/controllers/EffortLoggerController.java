@@ -73,9 +73,17 @@ public class EffortLoggerController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("making database");
         database = new Database();
         try {
-            database.init();
+            String os = System.getProperty("os.name").toLowerCase();
+            if (os.startsWith("windows")) {
+                database.init(System.getProperty("user.home") + "/AppData/EffortLogger/");
+            } else if (os.startsWith("linux")) {
+                database.init(System.getProperty("user.home") + ".effortlogger/");
+            } else if (os.startsWith("mac")) {
+                database.init(System.getProperty("user.home") + "/Desktop/EffortLogger/");
+            }
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }

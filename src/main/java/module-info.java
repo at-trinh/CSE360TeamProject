@@ -3,10 +3,11 @@ module me.thfour.effortlogger {
     requires javafx.fxml;
     requires javafx.graphics;
 
-    requires com.h2database;
     requires java.sql;
     requires MaterialFX;
     requires fr.brouillard.oss.cssfx;
+    requires org.hsqldb;
+    requires com.h2database;
 
     //requires org.controlsfx.controls;
     //requires org.kordamp.bootstrapfx.core;

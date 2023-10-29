@@ -10,7 +10,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import me.thfour.effortlogger.models.UserStory;
-import org.h2.engine.User;
 
 import java.net.URL;
 import java.sql.SQLException;

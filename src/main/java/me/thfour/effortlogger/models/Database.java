@@ -6,9 +6,9 @@ import java.util.ArrayList;
 public class Database {
     private Connection connection;
 
-    public void init() throws SQLException, ClassNotFoundException {
+    public void init(String url) throws SQLException, ClassNotFoundException {
 //        Class.forName("org.h2.Driver");
-        String jdbcUrl = "jdbc:h2:./effortloggerdatabase";
+        String jdbcUrl = "jdbc:h2:" + url + "effortloggerdatabase";
         this.connection = DriverManager.getConnection(jdbcUrl);
         System.out.println("Connected to database!");
         createUserStoryTable();

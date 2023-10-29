@@ -6,7 +6,7 @@
 
     <groupId>me.thfour</groupId>
     <artifactId>effortlogger</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1.0</version>
 
     <!-- This description text is included in the Windows installer by default, see windows-jpackage.txt -->
     <description>The best EffortLogger known to man</description>
@@ -14,8 +14,8 @@
     <properties>
         <main-class>me.thfour.effortlogger.HelloApplication</main-class>
         <app.name>EffortLogger</app.name>
-        <app.version>1.0.0</app.version>
-        <jvm.modules>javafx.controls,javafx.fxml</jvm.modules>
+        <app.version>1.1.0</app.version>
+        <jvm.modules>javafx.controls,javafx.fxml,java.sql</jvm.modules>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -54,6 +54,13 @@
             <groupId>fr.brouillard.oss</groupId>
             <artifactId>cssfx</artifactId>
             <version>11.4.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.hsqldb/hsqldb -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.7.2</version>
         </dependency>
     </dependencies>
 
