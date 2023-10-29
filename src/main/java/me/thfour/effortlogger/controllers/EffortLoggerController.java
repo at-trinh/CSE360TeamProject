@@ -75,6 +75,8 @@ public class EffortLoggerController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("making database");
         database = new Database();
+
+        // set the correct path for the database depending on system specification
         try {
             String os = System.getProperty("os.name").toLowerCase();
             if (os.startsWith("windows")) {
@@ -84,24 +86,27 @@ public class EffortLoggerController implements Initializable {
             } else if (os.startsWith("mac")) {
                 database.init(System.getProperty("user.home") + "/Desktop/EffortLogger/");
             }
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
-
+        // basic action events for the close and minimize buttons
         closeIcon.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> Platform.exit());
         minimizeIcon.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> ((Stage) rootPane.getScene().getWindow()).setIconified(true));
 
         initializeLoader();
 
+        // make it so the list is scrollable if the window size is reduced
         ScrollUtils.addSmoothScrolling(scrollPane);
     }
 
     private void initializeLoader() {
+        // create a loader that loads in views with icons
         MFXLoader loader = new MFXLoader();
         loader.addView(MFXLoaderBean.of("PLANNING-POKER", ResourceLoader.loadURL("fxml/PlanningPoker.fxml")).setBeanToNodeMapper(() -> createToggle("fas-circle-dot", "Planning Poker")).setDefaultRoot(true).get());
         loader.addView(MFXLoaderBean.of("VIEW-STORY", ResourceLoader.loadURL("fxml/ViewStory.fxml")).setBeanToNodeMapper(() -> createToggle("fas-circle-dot", "View Stories")).get());
 
+        // create the toggle buttons and add them to the navigation bar on the left side of the screen
         loader.setOnLoadedAction(beans -> {
             List<ToggleButton> nodes = beans.stream()
                     .map(bean -> {
@@ -122,6 +127,7 @@ public class EffortLoggerController implements Initializable {
         return createToggle(icon, text, 0);
     }
 
+    // used to make the toggle buttons
     private ToggleButton createToggle(String icon, String text, double rotate) {
         MFXIconWrapper wrapper = new MFXIconWrapper(icon, 24, 32);
         MFXRectangleToggleNode toggleNode = new MFXRectangleToggleNode(text, wrapper);

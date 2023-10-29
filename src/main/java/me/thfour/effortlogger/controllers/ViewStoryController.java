@@ -22,6 +22,7 @@ public class ViewStoryController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // get user stories from database
         ArrayList<UserStory> userStories = null;
         try {
             userStories = EffortLoggerController.getDatabase().getUserStories();
@@ -29,6 +30,7 @@ public class ViewStoryController implements Initializable {
             throw new RuntimeException(e);
         }
 
+        // initialize data columns
         MFXTableColumn<UserStory> projectColumn = new MFXTableColumn<>("Project", true, Comparator.comparing(UserStory::getProject));
         MFXTableColumn<UserStory> titleColumn = new MFXTableColumn<>("Title", true, Comparator.comparing(UserStory::getTitle));
         MFXTableColumn<UserStory> phaseColumn = new MFXTableColumn<>("Phase", true, Comparator.comparing(UserStory::getPhase));
@@ -39,6 +41,7 @@ public class ViewStoryController implements Initializable {
         MFXTableColumn<UserStory> tagsColumn = new MFXTableColumn<>("Tags", true, Comparator.comparing(UserStory::getTags));
         MFXTableColumn<UserStory> storyColumn = new MFXTableColumn<>("Story Points", true, Comparator.comparing(UserStory::getStoryPoints));
 
+        // create factorys for each of the columns
         projectColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getProject));
         titleColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getTitle));
         phaseColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getPhase));
@@ -49,12 +52,16 @@ public class ViewStoryController implements Initializable {
         tagsColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getTags));
         storyColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getStoryPoints));
 
+        // add columns to table
         viewStoryTable.getTableColumns().addAll(projectColumn, titleColumn, phaseColumn, effortColumn, delivColumn, statusColumn, descriptColumn, tagsColumn, storyColumn);
+
+        // populate table
         viewStoryTable.setItems(FXCollections.observableArrayList(userStories));
     }
 
     @FXML
     void refresh(ActionEvent event) {
+        // populate table once again
         ArrayList<UserStory> userStories = null;
         try {
             userStories = EffortLoggerController.getDatabase().getUserStories();

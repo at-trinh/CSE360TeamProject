@@ -6,14 +6,17 @@ import java.util.ArrayList;
 public class Database {
     private Connection connection;
 
-    public void init(String url) throws SQLException, ClassNotFoundException {
-//        Class.forName("org.h2.Driver");
-        String jdbcUrl = "jdbc:h2:" + url + "effortloggerdatabase";
-        this.connection = DriverManager.getConnection(jdbcUrl);
+    public void init(String url) throws SQLException {
+        String jdbcUrl = "jdbc:h2:" + url + "effortloggerdatabase"; // url for where the database should be saved
+        this.connection = DriverManager.getConnection(jdbcUrl); // create connection
         System.out.println("Connected to database!");
-        createUserStoryTable();
+        createUserStoryTable(); // ensure data can be saved
     }
 
+    /**
+     * Creates the UserStory table where user stories are saved
+     * @throws SQLException
+     */
     public void createUserStoryTable() throws SQLException {
         PreparedStatement ps = connection.prepareStatement("CREATE TABLE IF NOT EXISTS UserStories(\n" +
                 "    StoryId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +
@@ -32,6 +35,11 @@ public class Database {
         ps.close();
     }
 
+    /**
+     * Enters a **NEW** user story into the database
+     * @param story user story to saved
+     * @throws SQLException
+     */
     public void addUserStory(UserStory story) throws SQLException {
         PreparedStatement ps = connection.prepareStatement("INSERT INTO USERSTORIES (Project, Title, Phase, EffortCategory, Deliverable, Description, Tags, StoryPoints) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? );");
         ps.setString(1, story.getProject());
@@ -46,10 +54,17 @@ public class Database {
         ps.close();
     }
 
+    /**
+     * Gets a list of all user stories in the database
+     * @return all user stories in the database
+     * @throws SQLException
+     */
     public ArrayList<UserStory> getUserStories() throws SQLException {
         ArrayList<UserStory> stories = new ArrayList<>();
+
         PreparedStatement ps = connection.prepareStatement("SELECT * FROM USERSTORIES;");
         ResultSet rs = ps.executeQuery();
+
         while (rs.next()) {
             stories.add(
                     new UserStory(
@@ -67,6 +82,8 @@ public class Database {
                     )
             );
         }
+        rs.close();
+        ps.close();
         return stories;
     }
 }

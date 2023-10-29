@@ -5,6 +5,11 @@ import java.net.URL;
 
 public class ResourceLoader {
 
+    /***
+     * Load a resource from a given url
+     * @param path where the resource is
+     * @return the path of the resource
+     */
     public static URL loadURL(String path) {
         return ResourceLoader.class.getResource(path);
     }

@@ -58,6 +58,7 @@ public class PlanningPokerController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // list of fields to easily check if any are empty
         fields = new ArrayList<>(Arrays.asList(
             projectField,
             titleField,
@@ -71,6 +72,10 @@ public class PlanningPokerController implements Initializable {
         userStories = new ArrayList<>();
     }
 
+    /**
+     * Adds constraints to each of the textfields to make sure they aren't empty
+     * @param textField
+     */
     private void constraintBuilder(MFXTextField textField) {
         Constraint constraint =Constraint.Builder.build()
                 .setSeverity(Severity.ERROR)
@@ -102,6 +107,7 @@ public class PlanningPokerController implements Initializable {
 
     @FXML
     void doneButtonEvent(ActionEvent event) {
+        //  return if any fields are empty
         for (MFXTextField field : fields) {
             if (field.textProperty().length().isEqualTo(0).get()) {
                 System.out.println("One or more textfield is empty");
@@ -109,6 +115,7 @@ public class PlanningPokerController implements Initializable {
             }
         }
 
+        // add current user story to array
         add(new UserStory(
                 projectField.textProperty().get(),
                 titleField.textProperty().get(),
@@ -119,6 +126,8 @@ public class PlanningPokerController implements Initializable {
                 tagsField.textProperty().get(),
                 40 // TODO calculate story points2
         ));
+
+        // add user stories to database
         for (UserStory story : userStories) {
             try {
                 EffortLoggerController.getDatabase().addUserStory(story);
@@ -130,6 +139,7 @@ public class PlanningPokerController implements Initializable {
 
     @FXML
     void nextButtonEvent(ActionEvent event) {
+        // return if any fields are empty
         for (MFXTextField field : fields) {
             if (field.textProperty().length().isEqualTo(0).get()) {
                 System.out.println("One or more textfield is empty");
@@ -137,7 +147,9 @@ public class PlanningPokerController implements Initializable {
             }
         }
 
+        // enable the previous button now that we are on a new page
         previousButton.setDisable(false);
+        // add story to array
         add(new UserStory(
                 projectField.textProperty().get(),
                 titleField.textProperty().get(),
@@ -148,7 +160,10 @@ public class PlanningPokerController implements Initializable {
                 tagsField.textProperty().get(),
                 40 // TODO calculate story points2
         ));
+
         index++;
+
+        // set the values of the fields to the next page
         for (MFXTextField field : fields) {
             if (userStories.size() == index) {
                 field.textProperty().set("");
@@ -167,6 +182,7 @@ public class PlanningPokerController implements Initializable {
 
     @FXML
     void previousButtonEvent(ActionEvent event) {
+        // save the current fields
         add(new UserStory(
                 projectField.textProperty().get(),
                 titleField.textProperty().get(),
@@ -178,6 +194,7 @@ public class PlanningPokerController implements Initializable {
                 40 // TODO calculate story points2
         ));
         index--;
+        // display the previous item
         UserStory story = userStories.get(index);
         projectField.textProperty().set(story.getProject());
         titleField.textProperty().set(story.getTitle());
@@ -186,11 +203,14 @@ public class PlanningPokerController implements Initializable {
         deliverableField.textProperty().set(story.getDeliverable());
         descriptionField.textProperty().set(story.getDescription());
         tagsField.textProperty().set(story.getTags());
+
+        // if this is the first item, disable the previous button
         if (index == 0)
             previousButton.setDisable(true);
     }
 
     private void add(UserStory story) {
+        // use add if it doesnt exist and use set when it does exist.
         if (userStories.size() == index) {
             userStories.add(
                     index,
