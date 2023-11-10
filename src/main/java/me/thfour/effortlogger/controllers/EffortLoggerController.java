@@ -105,6 +105,7 @@ public class EffortLoggerController implements Initializable {
         MFXLoader loader = new MFXLoader();
         loader.addView(MFXLoaderBean.of("PLANNING-POKER", ResourceLoader.loadURL("fxml/PlanningPoker.fxml")).setBeanToNodeMapper(() -> createToggle("fas-circle-dot", "Planning Poker")).setDefaultRoot(true).get());
         loader.addView(MFXLoaderBean.of("VIEW-STORY", ResourceLoader.loadURL("fxml/ViewStory.fxml")).setBeanToNodeMapper(() -> createToggle("fas-circle-dot", "View Stories")).get());
+        loader.addView(MFXLoaderBean.of("SETTINGS", ResourceLoader.loadURL("fxml/Settings.fxml")).setBeanToNodeMapper(() -> createToggle("fas-circle-dot", "Settings")).get());
 
         // create the toggle buttons and add them to the navigation bar on the left side of the screen
         loader.setOnLoadedAction(beans -> {
