@@ -80,7 +80,7 @@ public class EffortLoggerController implements Initializable {
         try {
             String os = System.getProperty("os.name").toLowerCase();
             if (os.startsWith("windows")) {
-                database.init(System.getProperty("user.home") + "/AppData/EffortLogger/");
+                database.init(System.getProperty("user.home") + "/AppData/Roaming/EffortLogger/");
             } else if (os.startsWith("linux")) {
                 database.init(System.getProperty("user.home") + ".effortlogger/");
             } else if (os.startsWith("mac")) {

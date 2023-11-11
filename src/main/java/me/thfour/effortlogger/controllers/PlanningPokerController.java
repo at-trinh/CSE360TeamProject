@@ -1,44 +1,34 @@
 package me.thfour.effortlogger.controllers;
 
-import io.github.palexdev.materialfx.controls.MFXButton;
-import io.github.palexdev.materialfx.controls.MFXComboBox;
-import io.github.palexdev.materialfx.controls.MFXPaginatedTableView;
-import io.github.palexdev.materialfx.controls.MFXTextField;
+import io.github.palexdev.materialfx.controls.*;
+import io.github.palexdev.materialfx.enums.ButtonType;
+import io.github.palexdev.materialfx.enums.FloatMode;
 import io.github.palexdev.materialfx.validation.Constraint;
 import io.github.palexdev.materialfx.validation.Severity;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.util.Pair;
 import me.thfour.effortlogger.models.UserStory;
 
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlanningPokerController implements Initializable {
-
-    @FXML
-    private MFXComboBox<String> projectField;
-
-    @FXML
-    private MFXTextField titleField;
-
-    @FXML
-    private MFXComboBox<String> phaseField;
-
-    @FXML
-    private MFXComboBox<String> effortCategoryField;
-
-    @FXML
-    private MFXComboBox<String> deliverableField;
-
-    @FXML
-    private MFXTextField tagsField;
-
-    @FXML
-    private MFXTextField descriptionField;
 
     @FXML
     private MFXButton doneButton;
@@ -52,80 +42,166 @@ public class PlanningPokerController implements Initializable {
     @FXML
     private MFXPaginatedTableView<UserStory> paginated;
 
-    private ArrayList<MFXTextField> fields;
+    @FXML
+    private ScrollPane content;
+
+    private final HashMap<MFXTextField, Label> fields = new HashMap<>();
     private int index = 0;
-    private ArrayList<UserStory> userStories;
+    private final ArrayList<UserStory> userStories = new ArrayList<>();
+    private VBox defectVBox;
+    private MFXToggleButton toggle;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // list of fields to easily check if any are empty
-        fields = new ArrayList<>(Arrays.asList(
-            projectField,
-            titleField,
-            phaseField,
-            effortCategoryField,
-            deliverableField,
-            tagsField,
-            descriptionField
-        ));
+        createInputPane();
+        fields.forEach((this::constraintBuilder));
+    }
 
-        userStories = new ArrayList<>();
+    private void createInputPane() {
+        GridPane gridPane = new GridPane();
+        gridPane.setPadding(new Insets(10));
+        gridPane.setHgap(5);
+        gridPane.setVgap(5);
+        final ColumnConstraints col1 = new ColumnConstraints();
+        col1.setHgrow(Priority.ALWAYS);
+        final ColumnConstraints col2 = new ColumnConstraints();
+        col2.setHgrow(Priority.ALWAYS);
+        gridPane.getColumnConstraints().addAll(col1, col2);
+        Pair<MFXComboBox<String>, Label> projectPair = comboBoxBuilder("Project");
+        Pair<MFXTextField, Label> titlePair = textFieldBuilder("Title");
+        Pair<MFXComboBox<String>, Label> phasePair = comboBoxBuilder("Phase");
+        Pair<MFXComboBox<String>, Label> effortPair = comboBoxBuilder("Effort Category");
+        Pair<MFXComboBox<String>, Label> deliverablePair = comboBoxBuilder("Deliverable");
+        Pair<MFXTextField, Label> tagsPair = textFieldBuilder("Tags");
+        Pair<MFXTextField, Label> descriptionPair = textFieldBuilder("Description");
+
+        gridPane.add(new VBox(projectPair.getKey(), projectPair.getValue()), 0, 0);
+        gridPane.add(new VBox(titlePair.getKey(), titlePair.getValue()), 1, 0);
+        gridPane.add(new VBox(phasePair.getKey(), phasePair.getValue()), 0, 1);
+        gridPane.add(new VBox(effortPair.getKey(), effortPair.getValue()), 1, 1);
+        gridPane.add(new VBox(deliverablePair.getKey(), deliverablePair.getValue()), 0, 2);
+        gridPane.add(new VBox(tagsPair.getKey(), tagsPair.getValue()), 1, 2);
+        gridPane.add(new VBox(descriptionPair.getKey(), descriptionPair.getValue()), 0, 3, 2, 1);
+
+        this.toggle = new MFXToggleButton("Defect?");
+        toggle.setOnAction(e -> {
+            defectVBox.setVisible(toggle.isSelected());
+        });
+        Pair<MFXComboBox<String>, Label> defectPair = comboBoxBuilder("Defect Category");
+        defectVBox = new VBox(defectPair.getKey(), defectPair.getValue());
+        defectVBox.setVisible(false);
+        gridPane.add(toggle, 0, 4);
+        gridPane.add(defectVBox, 1, 4);
+
+        Pair<MFXTextField, Label> storyPointsPair = textFieldBuilder("Story Points");
+        storyPointsPair.getKey().setTextFormatter(new TextFormatter<>(change -> {
+            String text = change.getControlNewText();
+
+            if (text.matches("[0-9]*")) {
+                return change;
+            }
+
+            return null;
+        }));
+        gridPane.add(new VBox(storyPointsPair.getKey(), storyPointsPair.getValue()), 0, 5);
+        MFXButton button = new MFXButton("Calculate");
+        button.setButtonType(ButtonType.RAISED);
+        button.setOnAction(e -> {
+            System.out.println(storyPointsPair.getKey().getText());
+        });
+        VBox buttonVBox = new VBox(button);
+        buttonVBox.setAlignment(Pos.BASELINE_LEFT);
+        gridPane.add(buttonVBox, 1, 5);
+
+
+        VBox vbox = new VBox();
+        vbox.setFillWidth(true);
+        vbox.getChildren().setAll(gridPane);
+        content.setContent(vbox);
+        content.setFitToWidth(true);
+
+        fields.put(projectPair.getKey(), projectPair.getValue());
+        fields.put(titlePair.getKey(), titlePair.getValue());
+        fields.put(phasePair.getKey(), phasePair.getValue());
+        fields.put(effortPair.getKey(), effortPair.getValue());
+        fields.put(deliverablePair.getKey(), deliverablePair.getValue());
+        fields.put(tagsPair.getKey(), tagsPair.getValue());
+        fields.put(descriptionPair.getKey(), descriptionPair.getValue());
+        fields.put(defectPair.getKey(), defectPair.getValue());
+        fields.put(storyPointsPair.getKey(), storyPointsPair.getValue());
+    }
+
+    private Pair<MFXComboBox<String>, Label> comboBoxBuilder(String fieldName) {
+        MFXComboBox<String> mfxComboBox = new MFXComboBox<>();
+        mfxComboBox.setFloatMode(FloatMode.BORDER);
+        mfxComboBox.setFloatingText(fieldName);
+        mfxComboBox.setAllowEdit(true);
+        mfxComboBox.setMinWidth(200);
+        mfxComboBox.setMaxWidth(Double.MAX_VALUE);
+        Label label = new Label(String.format("%s must not be empty", fieldName));
+        label.setVisible(false);
+        label.setTextFill(Color.web("cc0000"));
+        label.setPadding(new Insets(0, 0, 0, 5));
+        return new Pair<>(mfxComboBox, label);
+    }
+
+    private Pair<MFXTextField, Label> textFieldBuilder(String fieldName) {
+        MFXTextField textField = new MFXTextField();
+        textField.setFloatMode(FloatMode.BORDER);
+        textField.setFloatingText(fieldName);
+        textField.setAllowEdit(true);
+        textField.setMinWidth(200);
+        textField.setMaxWidth(Double.MAX_VALUE);
+        Label label = new Label(String.format("%s must not be empty", fieldName));
+        label.setVisible(false);
+        label.setTextFill(Color.web("cc0000"));
+        label.setPadding(new Insets(0, 0, 0, 5));
+        return new Pair<>(textField, label);
     }
 
     /**
      * Adds constraints to each of the textfields to make sure they aren't empty
-     * @param textField
+     * @param field text field
+     * @param label label for text field
      */
-    private void constraintBuilder(MFXTextField textField) {
-        Constraint constraint =Constraint.Builder.build()
+    private void constraintBuilder(MFXTextField field, Label label) {
+        Constraint constraint = Constraint.Builder.build()
                 .setSeverity(Severity.ERROR)
-                .setMessage(textField.getFloatingText() + " can not be empty")
-                .setCondition(textField.textProperty().length().lessThan(0))
+                .setMessage(field.getFloatingText() + " can not be empty")
+                .setCondition(field.textProperty().length().greaterThan(0))
                 .get();
-        textField.getValidator()
+
+        field.getValidator()
                 .constraint(constraint);
 
-        // TODO: validation doesn't work because each input box needs a validartion label and im too damn lazy for that shit
-//        textField.getValidator().validProperty().addListener((observable, oldValue, newValue) -> {
-//            if (newValue) {
-//                validationLabel.setVisible(false);
-//                passwordField.pseudoClassStateChanged(INVALID_PSEUDO_CLASS, false);
-//            }
-//        });
+        field.getValidator().validProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                label.setVisible(false);
+                //field.pseudoClassStateChanged(INVALID_PSEUDO_CLASS, false);
+            }
+        });
 
-//        textField.delegateFocusedProperty().addListener((observable, oldValue, newValue) -> {
-//            if (oldValue && !newValue) {
-//                List<Constraint> constraints = passwordField.validate();
-//                if (!constraints.isEmpty()) {
-//                    passwordField.pseudoClassStateChanged(INVALID_PSEUDO_CLASS, true);
-//                    validationLabel.setText(constraints.get(0).getMessage());
-//                    validationLabel.setVisible(true);
-//                }
-//            }
-//        });
+        field.delegateFocusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue && !newValue) {
+                List<Constraint> constraints = field.validate();
+                if (!constraints.isEmpty()) {
+                    //field.pseudoClassStateChanged(INVALID_PSEUDO_CLASS, true);
+                    label.setVisible(true);
+                }
+            }
+        });
+
+        //label.setVisible(true);
     }
 
     @FXML
     void doneButtonEvent(ActionEvent event) {
-        //  return if any fields are empty
-        for (MFXTextField field : fields) {
-            if (field.textProperty().length().isEqualTo(0).get()) {
-                System.out.println("One or more textfield is empty");
-                return;
-            }
-        }
-
         // add current user story to array
-        add(new UserStory(
-                projectField.textProperty().get(),
-                titleField.textProperty().get(),
-                phaseField.textProperty().get(),
-                effortCategoryField.textProperty().get(),
-                deliverableField.textProperty().get(),
-                descriptionField.textProperty().get(),
-                tagsField.textProperty().get(),
-                40 // TODO calculate story points2
-        ));
+        add(tempSave());
+
+        //  return if any fields are empty
+        if (checkStories())
+            return;
 
         // add user stories to database
         for (UserStory story : userStories) {
@@ -139,70 +215,33 @@ public class PlanningPokerController implements Initializable {
 
     @FXML
     void nextButtonEvent(ActionEvent event) {
+
         // return if any fields are empty
-        for (MFXTextField field : fields) {
-            if (field.textProperty().length().isEqualTo(0).get()) {
-                System.out.println("One or more textfield is empty");
-                return;
-            }
-        }
+        if (isEmptyField())
+            return;
 
         // enable the previous button now that we are on a new page
         previousButton.setDisable(false);
         // add story to array
-        add(new UserStory(
-                projectField.textProperty().get(),
-                titleField.textProperty().get(),
-                phaseField.textProperty().get(),
-                effortCategoryField.textProperty().get(),
-                deliverableField.textProperty().get(),
-                descriptionField.textProperty().get(),
-                tagsField.textProperty().get(),
-                40 // TODO calculate story points2
-        ));
-
+        add(tempSave());
         index++;
 
         // set the values of the fields to the next page
-        for (MFXTextField field : fields) {
-            if (userStories.size() == index) {
-                field.textProperty().set("");
-            } else {
-                UserStory story = userStories.get(index);
-                projectField.textProperty().set(story.getProject());
-                titleField.textProperty().set(story.getTitle());
-                phaseField.textProperty().set(story.getPhase());
-                effortCategoryField.textProperty().set(story.getEffortCategory());
-                deliverableField.textProperty().set(story.getDeliverable());
-                descriptionField.textProperty().set(story.getDescription());
-                tagsField.textProperty().set(story.getTags());
-            }
+        if (userStories.size() == index) {
+            resetState();
+        } else {
+            restoreStory(userStories.get(index));
         }
     }
 
     @FXML
     void previousButtonEvent(ActionEvent event) {
         // save the current fields
-        add(new UserStory(
-                projectField.textProperty().get(),
-                titleField.textProperty().get(),
-                phaseField.textProperty().get(),
-                effortCategoryField.textProperty().get(),
-                deliverableField.textProperty().get(),
-                descriptionField.textProperty().get(),
-                tagsField.textProperty().get(),
-                40 // TODO calculate story points2
-        ));
+        add(tempSave());
         index--;
         // display the previous item
         UserStory story = userStories.get(index);
-        projectField.textProperty().set(story.getProject());
-        titleField.textProperty().set(story.getTitle());
-        phaseField.textProperty().set(story.getPhase());
-        effortCategoryField.textProperty().set(story.getEffortCategory());
-        deliverableField.textProperty().set(story.getDeliverable());
-        descriptionField.textProperty().set(story.getDescription());
-        tagsField.textProperty().set(story.getTags());
+        restoreStory(story);
 
         // if this is the first item, disable the previous button
         if (index == 0)
@@ -222,5 +261,142 @@ public class PlanningPokerController implements Initializable {
                     story
             );
         }
+    }
+
+    private boolean isEmptyField() {
+        AtomicBoolean shouldReturn = new AtomicBoolean(false);
+        fields.forEach((field, label) -> {
+            if (field.getText().isEmpty() && !field.getFloatingText().equals("Defect Category")) {
+                label.setVisible(true);
+                shouldReturn.set(true);
+            } else if (field.getFloatingText().equals("Defect Category") && toggle.isSelected() && field.getText().isEmpty()) {
+                label.setVisible(true);
+                shouldReturn.set(true);
+            }
+        });
+
+        return shouldReturn.get();
+    }
+
+    private void resetState() {
+        fields.forEach((field, label) -> {
+            field.clear();
+            label.setVisible(false);
+        });
+    }
+
+    private UserStory tempSave() {
+        String project = null;
+        String title = null;
+        String phase = null;
+        String effortCategory = null;
+        String deliverable = null;
+        String description  = null;
+        String tags  = null;
+        int storyPoints = -1;
+        boolean isDefect = toggle.isSelected();
+        String defectCategory = null;
+        for (MFXTextField field : fields.keySet()) {
+            switch (field.getFloatingText()) {
+                case "Project":
+                    project = field.getText();
+                    break;
+                case "Title":
+                    title = field.getText();
+                    break;
+                case "Phase":
+                    phase = field.getText();
+                    break;
+                case "Effort Category":
+                    effortCategory = field.getText();
+                    break;
+                case "Deliverable":
+                    deliverable = field.getText();
+                    break;
+                case "Description":
+                    description = field.getText();
+                    break;
+                case "Tags":
+                    tags = field.getText();
+                    break;
+                case "Story Points":
+                    try {
+                        storyPoints = Integer.parseInt(field.getText());
+                    } catch (NumberFormatException e) {
+                        storyPoints = 0;
+                    }
+                    break;
+                case "Defect Category":
+                    defectCategory = field.getText();
+                    break;
+            }
+        }
+
+        return new UserStory(
+                project,
+                title,
+                phase,
+                effortCategory,
+                deliverable,
+                description,
+                tags,
+                storyPoints,
+                isDefect,
+                defectCategory
+        );
+    }
+
+    private void restoreStory(UserStory story) {
+        toggle.setSelected(story.isDefect());
+        for (MFXTextField field : fields.keySet()) {
+            switch (field.getFloatingText()) {
+                case "Project":
+                    field.setText(story.getProject());
+                    break;
+                case "Title":
+                    field.setText(story.getTitle());
+                    break;
+                case "Phase":
+                    field.setText(story.getPhase());
+                    break;
+                case "Effort Category":
+                    field.setText(story.getEffortCategory());
+                    break;
+                case "Deliverable":
+                    field.setText(story.getDeliverable());
+                    break;
+                case "Description":
+                    field.setText(story.getDescription());
+                    break;
+                case "Tags":
+                    field.setText(story.getTags());
+                    break;
+                case "Story Points":
+                    field.setText(String.valueOf(story.getStoryPoints()));
+                    break;
+                case "Defect Category":
+                    field.setText(story.getDefectCategory());
+                    break;
+            }
+        }
+    }
+
+    private boolean checkStories() {
+        for (int i = 0; i < userStories.size(); i++) {
+            UserStory story = userStories.get(i);
+            if (story.getProject().isBlank() || story.getTitle().isBlank() || story.getPhase().isBlank() ||
+                    story.getEffortCategory().isBlank() || story.getDeliverable().isBlank() ||
+                    story.getDescription().isBlank() || story.getTags().isBlank()) {
+                index = i;
+                if (index != 0) {
+                    previousButton.setDisable(false);
+                }
+                restoreStory(story);
+                isEmptyField();
+                return true;
+            }
+        }
+
+        return false;
     }
 }

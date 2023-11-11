@@ -4,8 +4,12 @@ import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.stage.FileChooser;
+import me.thfour.effortlogger.models.UserStory;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 
 import java.io.*;
+import java.sql.SQLException;
 
 public class SettingsController {
 
@@ -54,29 +58,39 @@ public class SettingsController {
         if (file != null) {
             try {
                 readFile(file);
-            } catch (IOException e) {
+            } catch (IOException | SQLException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
     // TODO
-    private static void writeFile(File file) throws IOException {
+    private void writeFile(File file) throws IOException {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
         writer.println("im alive!");
         writer.println("test 2");
         writer.close();
     }
 
-    // TODO
-    private static void readFile(File file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        String st;
-        while ((st = reader.readLine()) != null) {
-            System.out.println(st);
+    private void readFile(File file) throws IOException, SQLException {
+        Reader in = new FileReader(file);
+        Iterable<CSVRecord> records = CSVFormat.EXCEL.withHeader(impField.getText().split(",")).parse(in);
+        for (CSVRecord record : records) {
+            UserStory story = new UserStory(
+                    record.get("project"),
+                    record.get("title"),
+                    record.get("phase"),
+                    record.get("effort_category"),
+                    record.get("deliverable"),
+                    record.get("status"),
+                    record.get("description"),
+                    record.get("tags"),
+                    Integer.parseInt(record.get("story_points")),
+                    record.get("dates"),
+                    Boolean.parseBoolean(record.get("is_defect")),
+                    record.get("defect_category")
+            );
+            EffortLoggerController.getDatabase().addExistingUserStory(story);
         }
-        reader.close();
     }
-
-
 }

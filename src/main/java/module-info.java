@@ -6,7 +6,7 @@ module me.thfour.effortlogger {
     requires java.sql;
     requires MaterialFX;
     requires fr.brouillard.oss.cssfx;
-    requires org.hsqldb;
+    requires org.apache.commons.csv;
     requires com.h2database;
 
     //requires org.controlsfx.controls;

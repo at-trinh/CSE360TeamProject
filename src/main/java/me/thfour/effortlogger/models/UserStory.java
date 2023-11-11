@@ -12,8 +12,10 @@ public class UserStory {
     private String tags;
     private int storyPoints;
     private String dates;
+    private boolean isDefect;
+    private String defectCategory;
 
-    public UserStory(String project, String title, String phase, String effortCategory, String deliverable, String description, String tags, int storyPoints) {
+    public UserStory(String project, String title, String phase, String effortCategory, String deliverable, String description, String tags, int storyPoints, boolean isDefect, String defectCategory) {
         this.project = project;
         this.title = title;
         this.phase = phase;
@@ -22,6 +24,8 @@ public class UserStory {
         this.description = description;
         this.tags = tags;
         this.storyPoints = storyPoints;
+        this.isDefect = isDefect;
+        this.defectCategory = defectCategory;
     }
 
     public UserStory(int storyId, String project, String title, String phase, String effortCategory, String deliverable, String status, String description, String tags, int storyPoints, String dates) {
@@ -52,6 +56,8 @@ public class UserStory {
                 ", tags='" + tags + '\'' +
                 ", storyPoints=" + storyPoints +
                 ", dates='" + dates + '\'' +
+                ", isDefect=" + isDefect +
+                ", defectCategory='" + defectCategory + '\'' +
                 '}';
     }
 
@@ -73,6 +79,29 @@ public class UserStory {
 
     public String getEffortCategory() {
         return effortCategory;
+    }
+
+    public UserStory(String project, String title, String phase, String effortCategory, String deliverable, String status, String description, String tags, int storyPoints, String dates, boolean isDefect, String defectCategory) {
+        this.project = project;
+        this.title = title;
+        this.phase = phase;
+        this.effortCategory = effortCategory;
+        this.deliverable = deliverable;
+        this.status = status;
+        this.description = description;
+        this.tags = tags;
+        this.storyPoints = storyPoints;
+        this.dates = dates;
+        this.isDefect = isDefect;
+        this.defectCategory = defectCategory;
+    }
+
+    public boolean isDefect() {
+        return isDefect;
+    }
+
+    public String getDefectCategory() {
+        return defectCategory;
     }
 
     public String getDeliverable() {
