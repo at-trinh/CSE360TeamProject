@@ -9,6 +9,7 @@ import io.github.palexdev.mfxcore.utils.loader.MFXLoader;
 import io.github.palexdev.mfxcore.utils.loader.MFXLoaderBean;
 import io.github.palexdev.mfxresources.fonts.MFXFontIcon;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -112,7 +113,14 @@ public class EffortLoggerController implements Initializable {
             List<ToggleButton> nodes = beans.stream()
                     .map(bean -> {
                         ToggleButton toggle = (ToggleButton) bean.getBeanToNodeMapper().get();
-                        toggle.setOnAction(event -> contentPane.getChildren().setAll(bean.getRoot()));
+                        if (bean.getViewName().equals("VIEW-STORY")) {
+                            toggle.setOnAction(event -> {
+                                contentPane.getChildren().setAll(bean.getRoot());
+                                // TODO automatically fetch new list when button is pressed on view-story
+                            });
+                        } else {
+                            toggle.setOnAction(event -> contentPane.getChildren().setAll(bean.getRoot()));
+                        }
                         if (bean.isDefaultView()) {
                             contentPane.getChildren().setAll(bean.getRoot());
                             toggle.setSelected(true);

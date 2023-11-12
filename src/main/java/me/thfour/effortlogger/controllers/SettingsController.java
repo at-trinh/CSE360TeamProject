@@ -128,9 +128,9 @@ public class SettingsController implements Initializable {
                     .replace("description", story.getDescription())
                     .replace("tags", story.getTags())
                     .replace("story_points", String.valueOf(story.getStoryPoints()))
-                    .replace("dates", story.getDates())
+                    .replace("dates", (story.getDates() == null) ? "" : story.getDates())
                     .replace("is_defect", String.valueOf(story.isDefect()))
-                    .replace("defect_category", story.getDefectCategory());
+                    .replace("defect_category", (story.getDefectCategory() == null) ? "" : story.getDefectCategory());
         }
         return entries;
     }

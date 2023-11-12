@@ -1,12 +1,14 @@
 package me.thfour.effortlogger.controllers;
 
 import io.github.palexdev.materialfx.controls.*;
+import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
 import io.github.palexdev.materialfx.enums.ButtonType;
 import io.github.palexdev.materialfx.enums.FloatMode;
 import io.github.palexdev.materialfx.validation.Constraint;
 import io.github.palexdev.materialfx.validation.Severity;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -55,6 +57,48 @@ public class PlanningPokerController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         createInputPane();
         fields.forEach((this::constraintBuilder));
+        populateTable();
+        populateFields();
+    }
+
+    private void populateTable() {
+        // get user stories from database
+        ArrayList<UserStory> userStories = null;
+        try {
+            userStories = EffortLoggerController.getDatabase().getUserStories();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        // initialize data columns
+        MFXTableColumn<UserStory> projectColumn = new MFXTableColumn<>("Project", true, Comparator.comparing(UserStory::getProject));
+        MFXTableColumn<UserStory> titleColumn = new MFXTableColumn<>("Title", true, Comparator.comparing(UserStory::getTitle));
+        MFXTableColumn<UserStory> phaseColumn = new MFXTableColumn<>("Phase", true, Comparator.comparing(UserStory::getPhase));
+        MFXTableColumn<UserStory> effortColumn = new MFXTableColumn<>("Effort Category", true, Comparator.comparing(UserStory::getEffortCategory));
+        MFXTableColumn<UserStory> delivColumn = new MFXTableColumn<>("Deliverable", true, Comparator.comparing(UserStory::getDeliverable));
+        MFXTableColumn<UserStory> descriptColumn = new MFXTableColumn<>("Description", true, Comparator.comparing(UserStory::getDescription));
+        MFXTableColumn<UserStory> tagsColumn = new MFXTableColumn<>("Tags", true, Comparator.comparing(UserStory::getTags));
+        MFXTableColumn<UserStory> storyColumn = new MFXTableColumn<>("Story Points", true, Comparator.comparing(UserStory::getStoryPoints));
+
+        // create factorys for each of the columns
+        projectColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getProject));
+        titleColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getTitle));
+        phaseColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getPhase));
+        effortColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getEffortCategory));
+        delivColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getDeliverable));
+        descriptColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getDescription));
+        tagsColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getTags));
+        storyColumn.setRowCellFactory(userStory -> new MFXTableRowCell<>(UserStory::getStoryPoints));
+
+        // add columns to table
+        paginated.getTableColumns().addAll(projectColumn, titleColumn, phaseColumn, effortColumn, delivColumn, descriptColumn, tagsColumn, storyColumn);
+
+        // populate table
+        paginated.setItems(FXCollections.observableArrayList(userStories));
+    }
+
+    private void populateFields() {
+
     }
 
     private void createInputPane() {
@@ -154,7 +198,7 @@ public class PlanningPokerController implements Initializable {
         textField.setMaxWidth(Double.MAX_VALUE);
         Label label = new Label(String.format("%s must not be empty", fieldName));
         label.setVisible(false);
-        label.setTextFill(Color.web("cc0000"));
+        label.setTextFill(Color.web("#cc0000"));
         label.setPadding(new Insets(0, 0, 0, 5));
         return new Pair<>(textField, label);
     }

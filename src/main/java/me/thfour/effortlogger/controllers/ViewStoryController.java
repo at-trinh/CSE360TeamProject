@@ -70,4 +70,8 @@ public class ViewStoryController implements Initializable {
         }
         viewStoryTable.setItems(FXCollections.observableArrayList(userStories));
     }
+
+    public void attempt() {
+        System.out.println("blah");
+    }
 }
