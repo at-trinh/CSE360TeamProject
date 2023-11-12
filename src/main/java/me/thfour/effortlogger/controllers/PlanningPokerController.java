@@ -1,10 +1,15 @@
 package me.thfour.effortlogger.controllers;
 
+import io.github.palexdev.materialfx.beans.FilterBean;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
+import io.github.palexdev.materialfx.dialogs.MFXFilterDialog;
+import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
 import io.github.palexdev.materialfx.enums.ButtonType;
+import io.github.palexdev.materialfx.enums.ChainMode;
 import io.github.palexdev.materialfx.enums.FloatMode;
 import io.github.palexdev.materialfx.filter.StringFilter;
+import io.github.palexdev.materialfx.filter.base.AbstractFilter;
 import io.github.palexdev.materialfx.skins.MFXPaginatedTableViewSkin;
 import io.github.palexdev.materialfx.skins.MFXTableViewSkin;
 import io.github.palexdev.materialfx.validation.Constraint;
@@ -26,6 +31,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import me.thfour.effortlogger.models.UserStory;
+import org.h2.engine.User;
 
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -56,12 +62,17 @@ public class PlanningPokerController implements Initializable {
     private VBox defectVBox;
     private MFXToggleButton toggle;
 
+    private MFXFilterPane<?> filterPane;
+
+    private ArrayList<StringFilter<UserStory>> filters;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         createInputPane();
         fields.forEach((this::constraintBuilder));
         populateTable();
         populateFields();
+//        doReflection();
     }
 
     private void populateTable() {
@@ -96,13 +107,13 @@ public class PlanningPokerController implements Initializable {
         // add columns to table
         paginated.getTableColumns().addAll(projectColumn, titleColumn, phaseColumn, effortColumn, delivColumn, descriptColumn, tagsColumn, storyColumn);
 
-        paginated.getFilters().addAll(
-            new StringFilter<>("Project", UserStory::getProject),
-            new StringFilter<>("Phase", UserStory::getPhase),
-            new StringFilter<>("Effort Category", UserStory::getEffortCategory),
-            new StringFilter<>("Deliverable", UserStory::getDeliverable),
-            new StringFilter<>("Defect Category", UserStory::getDefectCategory)
-        );
+        filters = new ArrayList<>();
+        filters.add(new StringFilter<>("Project", UserStory::getProject));
+        filters.add(new StringFilter<>("Phase", UserStory::getPhase));
+        filters.add(new StringFilter<>("Effort Category", UserStory::getEffortCategory));
+        filters.add(new StringFilter<>("Deliverable", UserStory::getDeliverable));
+        filters.add(new StringFilter<>("Defect Category", UserStory::getDefectCategory));
+        paginated.getFilters().addAll(filters);
 
         // populate table
         paginated.setItems(FXCollections.observableArrayList(userStories));
@@ -213,19 +224,77 @@ public class PlanningPokerController implements Initializable {
                 }
             }
 
-//            if (paginated.getSkin() instanceof MFXPaginatedTableViewSkin<?> skin) {
-////                for (Field field : skin.getClass().getSuperclass().getDeclaredFields())  {
-////                    System.out.println(field.getName());
-////                }
-//                try {
-//                    Field field = skin.getClass().getSuperclass().getDeclaredField("filterDialog");
-//                    field.setAccessible(true);
-////                    System.out.println(field.getClass());
-//                } catch (NoSuchFieldException ex) {
-//                    throw new RuntimeException(ex);
-//                }
+//            for (FilterBean bean : filterPane.getActiveFilters()) {
+//                System.out.println(bean.getMode().text());
+//                System.out.println(bean.getQuery());
+//                System.out.println(bean.getPredicateName());
+//                System.out.println(bean.getPredicateBean().name());
 //            }
         });
+        MFXTooltip.of(
+                projectPair.getKey(),
+                """
+                     Enter the name of your project here.
+                     If you have already entered a user story with your project name, you can also select the project by clicking the drop down arrow on the right of the text field.
+                     """
+        ).install();
+
+        MFXTooltip.of(
+                titlePair.getKey(),
+                "Enter the title of your user story here."
+        ).install();
+
+        MFXTooltip.of(
+                phasePair.getKey(),
+                """
+                     Enter the phase that this user story is part of.
+                     If you have already entered a user story with your phase, you can also select the project by clicking the drop down arrow on the right of the text field.
+                     Some phases are Requirements, Conceptual Design, Test Case Generation, Reflection, Planning, Drafting, and Finalizing.
+                     """
+        ).install();
+
+        MFXTooltip.of(
+                effortPair.getKey(),
+                """
+                     Enter the effort category that this user story is part of.
+                     If you have already entered a user story with your effort category, you can also select the project by clicking the drop down arrow on the right of the text field.
+                     Some effort categories are Plans, Deliverables, Interruptions, and Defects. 
+                     """
+        ).install();
+
+        MFXTooltip.of(
+                deliverablePair.getKey(),
+                """
+                     Enter the deliverable that this user story is part of.
+                     If you have already entered a user story with your deliverable category, you can also select the project by clicking the drop down arrow on the right of the text field.
+                     Some deliverable categories are Conceptual Design, Reflection, Outline, Solution, Report, and Test Cases.
+                     """
+        ).install();
+
+        MFXTooltip.of(
+                tagsPair.getKey(),
+                """
+                     Enter some tags that help define your user story.
+                     Some examples include the programming language, feature, bug, and libraries.
+                     """
+        ).install();
+
+        MFXTooltip.of(
+                descriptionPair.getKey(),
+                """
+                     Enter a description so that you can search for your user story later or just jog your memory.
+                     """
+        ).install();
+
+        MFXTooltip.of(
+                defectPair.getKey(),
+                """
+                     Enter the defect category that this user story is part of.
+                     If you have already entered a user story with your defect category, you can also select the project by clicking the drop down arrow on the right of the text field.
+                     Some defect categories are Documentation, Syntax, Package, Function, Data, System, and Interface.
+                     """
+        ).install();
+
         VBox buttonVBox = new VBox(button);
         buttonVBox.setAlignment(Pos.BASELINE_LEFT);
         gridPane.add(buttonVBox, 1, 5);
@@ -246,6 +315,20 @@ public class PlanningPokerController implements Initializable {
         fields.put(descriptionPair.getKey(), descriptionPair.getValue());
         fields.put(defectPair.getKey(), defectPair.getValue());
         fields.put(storyPointsPair.getKey(), storyPointsPair.getValue());
+    }
+
+    private void doReflection() {
+        if (paginated.getSkin() instanceof MFXPaginatedTableViewSkin<?> skin) {
+            try {
+                Field field = skin.getClass().getSuperclass().getDeclaredField("filterPane");
+                field.setAccessible(true);
+                filterPane =(MFXFilterPane<?>) field.get(skin);
+            } catch (NoSuchFieldException ex) {
+                throw new RuntimeException(ex);
+            } catch (IllegalAccessException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
 
     private void recursiveSearch(Node node, String tabs) {

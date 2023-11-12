@@ -1,6 +1,7 @@
 package me.thfour.effortlogger.controllers;
 
 import io.github.palexdev.materialfx.controls.MFXTextField;
+import io.github.palexdev.materialfx.controls.MFXTooltip;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -144,5 +145,21 @@ public class SettingsController implements Initializable {
             throw new RuntimeException(e);
         }
         usernameField.setText(settings.getUsername());
+
+        MFXTooltip.of(
+                impField,
+                """
+                     Enter the format for your CSV Import here.
+                     Valid fields are "project", "title", "phase", "effort_category", "deliverable", "status", "description", "tags", "story_points", "is_defect", "defect_category", and "dates"
+                     """
+        ).install();
+
+        MFXTooltip.of(
+                expField,
+                """
+                     Enter the format for your CSV Export here.
+                     Valid fields are "project", "title", "phase", "effort_category", "deliverable", "status", "description", "tags", "story_points", "is_defect", "defect_category", and "dates"
+                     """
+        ).install();
     }
 }
