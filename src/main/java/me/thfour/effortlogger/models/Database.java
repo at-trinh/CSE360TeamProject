@@ -123,7 +123,9 @@ public class Database {
                             rs.getString("Description"),
                             rs.getString("Tags"),
                             rs.getInt("StoryPoints"),
-                            rs.getString("Dates")
+                            rs.getString("Dates"),
+                            rs.getBoolean("IsDefect"),
+                            rs.getString("DefectCategory")
                     )
             );
         }

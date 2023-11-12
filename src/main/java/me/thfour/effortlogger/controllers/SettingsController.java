@@ -6,10 +6,12 @@ import javafx.fxml.FXML;
 import javafx.stage.FileChooser;
 import me.thfour.effortlogger.models.UserStory;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class SettingsController {
 
@@ -39,6 +41,8 @@ public class SettingsController {
                 writeFile(file);
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -65,11 +69,14 @@ public class SettingsController {
     }
 
     // TODO
-    private void writeFile(File file) throws IOException {
+    private void writeFile(File file) throws IOException, SQLException {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-        writer.println("im alive!");
-        writer.println("test 2");
-        writer.close();
+        CSVPrinter printer = new CSVPrinter(writer, CSVFormat.EXCEL);
+        ArrayList<UserStory> userStories = EffortLoggerController.getDatabase().getUserStories();
+        for (UserStory story : userStories) {
+            printer.printRecord(getFormattedString(story));
+        }
+        printer.flush();
     }
 
     private void readFile(File file) throws IOException, SQLException {
@@ -92,5 +99,26 @@ public class SettingsController {
             );
             EffortLoggerController.getDatabase().addExistingUserStory(story);
         }
+    }
+
+    private String[] getFormattedString(UserStory story) {
+        String format = expField.getText();
+        String[] entries = format.split(",");
+        for (int i = 0; i < entries.length; i++) {
+            entries[i] = entries[i]
+                    .replace("project", story.getProject())
+                    .replace("title", story.getTitle())
+                    .replace("phase", story.getPhase())
+                    .replace("effort_category", story.getEffortCategory())
+                    .replace("deliverable", story.getDeliverable())
+                    .replace("status", story.getStatus())
+                    .replace("description", story.getDescription())
+                    .replace("tags", story.getTags())
+                    .replace("story_points", String.valueOf(story.getStoryPoints()))
+                    .replace("dates", story.getDates())
+                    .replace("is_defect", String.valueOf(story.isDefect()))
+                    .replace("defect_category", story.getDefectCategory());
+        }
+        return entries;
     }
 }
