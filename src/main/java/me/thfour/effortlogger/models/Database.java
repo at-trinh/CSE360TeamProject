@@ -134,6 +134,25 @@ public class Database {
         return stories;
     }
 
+    public Settings getSettings() throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("SELECT * FROM SETTINGS;");
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return new Settings(
+                    rs.getString("Username"),
+                    rs.getInt("LastUpdatedStoryId")
+            );
+        }
+        return new Settings("Default Username", null);
+    }
+
+    public void setUsername(String username) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("UPDATE SETTINGS SET USERNAME = ? WHERE Lock = 'X';");
+        ps.setString(1, username);
+        ps.executeUpdate();
+        ps.close();
+    }
+
     private String createDate() {
         Date date = new Date();
         return date.toString();

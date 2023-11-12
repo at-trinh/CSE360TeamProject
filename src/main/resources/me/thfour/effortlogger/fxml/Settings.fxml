@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import io.github.palexdev.materialfx.controls.MFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -51,8 +52,9 @@
             <MFXTextField fx:id="expField" floatMode="BORDER" floatingText="Export Fields" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" text="project,title,phase,effort_category,deliverable,status,description,tags,story_points,is_defect,defect_category,dates" />
             <MFXTextField fx:id="usernameField" floatMode="BORDER" floatingText="Username" layoutX="410.0" layoutY="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" GridPane.rowIndex="2" />
             <MFXTextField fx:id="impField" floatMode="BORDER" floatingText="Import Fields" layoutX="410.0" layoutY="80.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" text="project,title,phase,effort_category,deliverable,status,description,tags,story_points,is_defect,defect_category,dates" GridPane.rowIndex="1" />
-         <Button mnemonicParsing="false" onAction="#expEvent" text="Button" GridPane.columnIndex="1" />
-         <Button mnemonicParsing="false" onAction="#impEvent" text="Button" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         <Button mnemonicParsing="false" onAction="#expEvent" text="Export" GridPane.columnIndex="1" />
+         <Button mnemonicParsing="false" onAction="#impEvent" text="Import" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         <MFXButton onAction="#processUpdateUsername" text="Update Username" GridPane.columnIndex="1" GridPane.rowIndex="2" />
         </children>
         <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

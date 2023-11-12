@@ -3,17 +3,22 @@ package me.thfour.effortlogger.controllers;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.stage.FileChooser;
+import me.thfour.effortlogger.models.Database;
+import me.thfour.effortlogger.models.Settings;
 import me.thfour.effortlogger.models.UserStory;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.*;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
-public class SettingsController {
+public class SettingsController implements Initializable {
 
     @FXML
     private MFXTextField expField;
@@ -68,7 +73,15 @@ public class SettingsController {
         }
     }
 
-    // TODO
+    @FXML
+    void processUpdateUsername(ActionEvent event) {
+        try {
+            EffortLoggerController.getDatabase().setUsername(usernameField.getText());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void writeFile(File file) throws IOException, SQLException {
         PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
         CSVPrinter printer = new CSVPrinter(writer, CSVFormat.EXCEL);
@@ -120,5 +133,16 @@ public class SettingsController {
                     .replace("defect_category", story.getDefectCategory());
         }
         return entries;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        Settings settings;
+        try {
+            settings = EffortLoggerController.getDatabase().getSettings();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        usernameField.setText(settings.getUsername());
     }
 }
