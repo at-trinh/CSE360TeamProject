@@ -1,6 +1,7 @@
 package me.thfour.effortlogger.models;
 
-import org.h2.engine.User;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.util.ArrayList;
 import java.sql.*;
@@ -132,6 +133,20 @@ public class Database {
         rs.close();
         ps.close();
         return stories;
+    }
+
+    public ArrayList<String> getUniqueValues(String column) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement(String.format("SELECT DISTINCT %s from USERSTORIES ORDER BY %s ASC;", column, column));
+        ResultSet rs = ps.executeQuery();
+        ArrayList<String> values = new ArrayList<>();
+        String value;
+        while (rs.next()) {
+            value = rs.getString(column);
+            if (!value.isEmpty())
+                values.add(value);
+        }
+
+        return values;
     }
 
     public Settings getSettings() throws SQLException {

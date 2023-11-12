@@ -4,6 +4,9 @@ import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
 import io.github.palexdev.materialfx.enums.ButtonType;
 import io.github.palexdev.materialfx.enums.FloatMode;
+import io.github.palexdev.materialfx.filter.StringFilter;
+import io.github.palexdev.materialfx.skins.MFXPaginatedTableViewSkin;
+import io.github.palexdev.materialfx.skins.MFXTableViewSkin;
 import io.github.palexdev.materialfx.validation.Constraint;
 import io.github.palexdev.materialfx.validation.Severity;
 import javafx.beans.value.ChangeListener;
@@ -14,17 +17,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Skin;
 import javafx.scene.control.TextFormatter;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import me.thfour.effortlogger.models.UserStory;
 
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
@@ -93,12 +96,58 @@ public class PlanningPokerController implements Initializable {
         // add columns to table
         paginated.getTableColumns().addAll(projectColumn, titleColumn, phaseColumn, effortColumn, delivColumn, descriptColumn, tagsColumn, storyColumn);
 
+        paginated.getFilters().addAll(
+            new StringFilter<>("Project", UserStory::getProject),
+            new StringFilter<>("Phase", UserStory::getPhase),
+            new StringFilter<>("Effort Category", UserStory::getEffortCategory),
+            new StringFilter<>("Deliverable", UserStory::getDeliverable),
+            new StringFilter<>("Defect Category", UserStory::getDefectCategory)
+        );
+
         // populate table
         paginated.setItems(FXCollections.observableArrayList(userStories));
     }
 
     private void populateFields() {
-
+        for (MFXTextField field : fields.keySet()) {
+            switch (field.getFloatingText()) {
+                case "Project":
+                    try {
+                        ((MFXComboBox<String>) field).setItems(FXCollections.observableList(EffortLoggerController.getDatabase().getUniqueValues("PROJECT")));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case "Phase":
+                    try {
+                        ((MFXComboBox<String>) field).setItems(FXCollections.observableList(EffortLoggerController.getDatabase().getUniqueValues("PHASE")));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case "Effort Category":
+                    try {
+                        ((MFXComboBox<String>) field).setItems(FXCollections.observableList(EffortLoggerController.getDatabase().getUniqueValues("EffortCategory")));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case "Deliverable":
+                    try {
+                        ((MFXComboBox<String>) field).setItems(FXCollections.observableList(EffortLoggerController.getDatabase().getUniqueValues("Deliverable")));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case "Defect Category":
+                    try {
+                        ((MFXComboBox<String>) field).setItems(FXCollections.observableList(EffortLoggerController.getDatabase().getUniqueValues("DefectCategory")));
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+            }
+        }
     }
 
     private void createInputPane() {
@@ -151,7 +200,31 @@ public class PlanningPokerController implements Initializable {
         MFXButton button = new MFXButton("Calculate");
         button.setButtonType(ButtonType.RAISED);
         button.setOnAction(e -> {
-            System.out.println(storyPointsPair.getKey().getText());
+            OptionalDouble average = paginated.getTransformableList()
+                    .stream()
+                    .mapToDouble(UserStory::getStoryPoints)
+                    .average();
+            for (MFXTextField field : fields.keySet()) {
+                if (field.getFloatingText().equals("Story Points")) {
+                    if (average.isPresent())
+                        field.setText(String.valueOf((int) average.getAsDouble()));
+                    else
+                        field.setText("0");
+                }
+            }
+
+//            if (paginated.getSkin() instanceof MFXPaginatedTableViewSkin<?> skin) {
+////                for (Field field : skin.getClass().getSuperclass().getDeclaredFields())  {
+////                    System.out.println(field.getName());
+////                }
+//                try {
+//                    Field field = skin.getClass().getSuperclass().getDeclaredField("filterDialog");
+//                    field.setAccessible(true);
+////                    System.out.println(field.getClass());
+//                } catch (NoSuchFieldException ex) {
+//                    throw new RuntimeException(ex);
+//                }
+//            }
         });
         VBox buttonVBox = new VBox(button);
         buttonVBox.setAlignment(Pos.BASELINE_LEFT);
@@ -173,6 +246,15 @@ public class PlanningPokerController implements Initializable {
         fields.put(descriptionPair.getKey(), descriptionPair.getValue());
         fields.put(defectPair.getKey(), defectPair.getValue());
         fields.put(storyPointsPair.getKey(), storyPointsPair.getValue());
+    }
+
+    private void recursiveSearch(Node node, String tabs) {
+        System.out.println(tabs + node.getClass());
+        if (node instanceof Pane) {
+            for (Node node2 : ((Pane) node).getChildren()) {
+                recursiveSearch(node2, tabs + " ");
+            }
+        }
     }
 
     private Pair<MFXComboBox<String>, Label> comboBoxBuilder(String fieldName) {
