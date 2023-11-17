@@ -1,39 +1,29 @@
 package me.thfour.effortlogger.controllers;
 
-import io.github.palexdev.materialfx.beans.FilterBean;
 import io.github.palexdev.materialfx.controls.*;
 import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
-import io.github.palexdev.materialfx.dialogs.MFXFilterDialog;
-import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
 import io.github.palexdev.materialfx.enums.ButtonType;
-import io.github.palexdev.materialfx.enums.ChainMode;
 import io.github.palexdev.materialfx.enums.FloatMode;
 import io.github.palexdev.materialfx.filter.StringFilter;
-import io.github.palexdev.materialfx.filter.base.AbstractFilter;
-import io.github.palexdev.materialfx.skins.MFXPaginatedTableViewSkin;
-import io.github.palexdev.materialfx.skins.MFXTableViewSkin;
 import io.github.palexdev.materialfx.validation.Constraint;
 import io.github.palexdev.materialfx.validation.Severity;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Skin;
 import javafx.scene.control.TextFormatter;
-import javafx.scene.layout.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import me.thfour.effortlogger.models.UserStory;
-import org.h2.engine.User;
 
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
@@ -61,8 +51,6 @@ public class PlanningPokerController implements Initializable {
     private final ArrayList<UserStory> userStories = new ArrayList<>();
     private VBox defectVBox;
     private MFXToggleButton toggle;
-
-    private MFXFilterPane<?> filterPane;
 
     private ArrayList<StringFilter<UserStory>> filters;
 
@@ -224,12 +212,6 @@ public class PlanningPokerController implements Initializable {
                 }
             }
 
-//            for (FilterBean bean : filterPane.getActiveFilters()) {
-//                System.out.println(bean.getMode().text());
-//                System.out.println(bean.getQuery());
-//                System.out.println(bean.getPredicateName());
-//                System.out.println(bean.getPredicateBean().name());
-//            }
         });
         MFXTooltip.of(
                 projectPair.getKey(),
@@ -315,29 +297,6 @@ public class PlanningPokerController implements Initializable {
         fields.put(descriptionPair.getKey(), descriptionPair.getValue());
         fields.put(defectPair.getKey(), defectPair.getValue());
         fields.put(storyPointsPair.getKey(), storyPointsPair.getValue());
-    }
-
-    private void doReflection() {
-        if (paginated.getSkin() instanceof MFXPaginatedTableViewSkin<?> skin) {
-            try {
-                Field field = skin.getClass().getSuperclass().getDeclaredField("filterPane");
-                field.setAccessible(true);
-                filterPane =(MFXFilterPane<?>) field.get(skin);
-            } catch (NoSuchFieldException ex) {
-                throw new RuntimeException(ex);
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-    }
-
-    private void recursiveSearch(Node node, String tabs) {
-        System.out.println(tabs + node.getClass());
-        if (node instanceof Pane) {
-            for (Node node2 : ((Pane) node).getChildren()) {
-                recursiveSearch(node2, tabs + " ");
-            }
-        }
     }
 
     private Pair<MFXComboBox<String>, Label> comboBoxBuilder(String fieldName) {

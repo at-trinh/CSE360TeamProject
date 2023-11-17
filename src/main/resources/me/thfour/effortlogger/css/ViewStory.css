@@ -1,0 +1,13 @@
+@import '../fonts/Fonts.css';
+@import 'Common.css';
+@import 'MFXColors.css';
+
+.mfx-button {
+    -fx-font-family: 'Visby Round CF Medium';
+    -fx-text-fill: -mfx-test-he;
+}
+
+#custom {
+    -fx-background-color: -mfx-purple;
+    -fx-text-fill: white
+}

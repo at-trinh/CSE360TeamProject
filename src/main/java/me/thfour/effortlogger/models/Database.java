@@ -135,6 +135,26 @@ public class Database {
         return stories;
     }
 
+    public void addDateToUserStory(UserStory story, Date date, String status) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("UPDATE USERSTORIES SET DATES=?, STATUS=? WHERE STORYID=?;");
+        ps.setString(1, date.toString());
+        ps.setString(2, status);
+        ps.setInt(3, story.getStoryId());
+        ps.executeUpdate();
+        ps = connection.prepareStatement("UPDATE SETTINGS SET LastUpdatedStoryId=? WHERE Lock = 'X';");
+        ps.setInt(1, story.getStoryId());
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    public void setUserStoryStatus(UserStory story, String status) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("UPDATE USERSTORIES SET STATUS=? WHERE STORYID=?;");
+        ps.setString(1, status);
+        ps.setInt(2, story.getStoryId());
+        ps.executeUpdate();
+        ps.close();
+    }
+
     public ArrayList<String> getUniqueValues(String column) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(String.format("SELECT DISTINCT %s from USERSTORIES ORDER BY %s ASC;", column, column));
         ResultSet rs = ps.executeQuery();
@@ -147,6 +167,32 @@ public class Database {
         }
 
         return values;
+    }
+
+    public void updateUserStory(UserStory story) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("UPDATE USERSTORIES SET PROJECT=?,TITLE=?, PHASE=?, EFFORTCATEGORY=?, DELIVERABLE=?, STATUS=?, DESCRIPTION=?, TAGS=?, STORYPOINTS=?, ISDEFECT=?, DEFECTCATEGORY=?, DATES=? WHERE STORYID=?;");
+        ps.setString(1, story.getProject());
+        ps.setString(2, story.getTitle());
+        ps.setString(3, story.getPhase());
+        ps.setString(4, story.getEffortCategory());
+        ps.setString(5, story.getDeliverable());
+        ps.setString(6, story.getStatus());
+        ps.setString(7, story.getDescription());
+        ps.setString(8, story.getTags());
+        ps.setInt(9, story.getStoryPoints());
+        ps.setBoolean(10, story.isDefect());
+        ps.setString(11, story.getDefectCategory());
+        ps.setString(12, story.getDates());
+        ps.setInt(13, story.getStoryId());
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    public void deleteStoryFromTable(int storyId) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("DELETE FROM USERSTORIES WHERE STORYID=?;");
+        ps.setInt(1, storyId);
+        ps.executeUpdate();
+        ps.close();
     }
 
     public Settings getSettings() throws SQLException {

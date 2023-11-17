@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXComboBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="grid-pane" stylesheets="@../css/Common.css" vgap="10.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.thfour.effortlogger.controllers.EffortConsoleController">
+    <columnConstraints>
+        <ColumnConstraints halignment="CENTER" minWidth="10.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+        <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+    </rowConstraints>
+    <padding>
+        <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
+    </padding>
+    <StackPane minHeight="128.0" minWidth="300.0" prefWidth="830.0" styleClass="grid-background" GridPane.columnSpan="2147483647" GridPane.rowSpan="2147483647">
+        <GridPane.margin>
+            <Insets bottom="-15.0" left="-15.0" right="-15.0" />
+        </GridPane.margin>
+    </StackPane>
+    <Label alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="header-label" text="Effort Console" GridPane.columnSpan="2147483647">
+        <GridPane.margin>
+            <Insets />
+        </GridPane.margin>
+        <padding>
+            <Insets bottom="10.0" top="10.0" />
+        </padding>
+    </Label>
+   <VBox prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="1">
+      <children>
+         <MFXComboBox fx:id="userStory" floatMode="BORDER" floatingText="User Story" maxWidth="1.7976931348623157E308" />
+      </children>
+   </VBox>
+   <VBox fx:id="buttonVBox" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="2" />
+   <GridPane alignment="CENTER" GridPane.rowIndex="3">
+     <columnConstraints>
+       <ColumnConstraints hgrow="SOMETIMES" maxWidth="393.0" minWidth="10.0" prefWidth="87.0" />
+       <ColumnConstraints hgrow="SOMETIMES" maxWidth="713.0" minWidth="10.0" prefWidth="713.0" />
+     </columnConstraints>
+     <rowConstraints>
+       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+     </rowConstraints>
+      <children>
+         <Label text="Elapsed Time:" />
+         <Label fx:id="elapsedTimeLabel" text="00:00:00" GridPane.columnIndex="1" />
+      </children>
+   </GridPane>
+   <VBox fx:id="clockStatusVBox" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="4">
+      <children>
+         <Label fx:id="clockProgress" alignment="CENTER" text="CLOCK IS STOPPED" textAlignment="CENTER" />
+      </children>
+   </VBox>
+</GridPane>

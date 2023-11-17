@@ -28,20 +28,6 @@ public class UserStory {
         this.defectCategory = defectCategory;
     }
 
-    public UserStory(int storyId, String project, String title, String phase, String effortCategory, String deliverable, String status, String description, String tags, int storyPoints, String dates) {
-        this.storyId = storyId;
-        this.project = project;
-        this.title = title;
-        this.phase = phase;
-        this.effortCategory = effortCategory;
-        this.deliverable = deliverable;
-        this.status = status;
-        this.description = description;
-        this.tags = tags;
-        this.storyPoints = storyPoints;
-        this.dates = dates;
-    }
-
     public UserStory(int storyId, String project, String title, String phase, String effortCategory, String deliverable, String status, String description, String tags, int storyPoints, String dates, boolean isDefect, String defectCategory) {
         this.storyId = storyId;
         this.project = project;
@@ -60,6 +46,10 @@ public class UserStory {
 
     @Override
     public String toString() {
+        return String.format("%s, %s, %s, %s, %s, %s, %s, %d, %s, %s", project, title, phase, effortCategory, deliverable, status, tags, storyPoints, isDefect ? "Defect" : "Not a Defect", defectCategory);
+    }
+
+    public String toFormattedString() {
         return "UserStory{" +
                 "storyId=" + storyId +
                 ", project='" + project + '\'' +

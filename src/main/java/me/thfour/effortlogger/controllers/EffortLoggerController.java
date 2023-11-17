@@ -24,6 +24,7 @@ import javafx.stage.Stage;
 import me.thfour.effortlogger.ResourceLoader;
 import me.thfour.effortlogger.models.Database;
 
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
@@ -72,6 +73,8 @@ public class EffortLoggerController implements Initializable {
         ToggleButtonsUtil.addAlwaysOneSelectedSupport(toggleGroup);
     }
 
+    ViewStoryController viewStoryController;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("making database");
@@ -104,9 +107,10 @@ public class EffortLoggerController implements Initializable {
     private void initializeLoader() {
         // create a loader that loads in views with icons
         MFXLoader loader = new MFXLoader();
-        loader.addView(MFXLoaderBean.of("PLANNING-POKER", ResourceLoader.loadURL("fxml/PlanningPoker.fxml")).setBeanToNodeMapper(() -> createToggle("fas-circle-dot", "Planning Poker")).setDefaultRoot(true).get());
-        loader.addView(MFXLoaderBean.of("VIEW-STORY", ResourceLoader.loadURL("fxml/ViewStory.fxml")).setBeanToNodeMapper(() -> createToggle("fas-circle-dot", "View Stories")).get());
-        loader.addView(MFXLoaderBean.of("SETTINGS", ResourceLoader.loadURL("fxml/Settings.fxml")).setBeanToNodeMapper(() -> createToggle("fas-circle-dot", "Settings")).get());
+        loader.addView(MFXLoaderBean.of("PLANNING-POKER", ResourceLoader.loadURL("fxml/PlanningPoker.fxml")).setBeanToNodeMapper(() -> createToggle("fas-bullseye", "Planning Poker")).setDefaultRoot(true).get());
+        loader.addView(MFXLoaderBean.of("EFFORT-CONSOLE", ResourceLoader.loadURL("fxml/EffortConsole.fxml")).setBeanToNodeMapper(() -> createToggle("fas-terminal", "Effort Console")).get());
+        loader.addView(MFXLoaderBean.of("VIEW-STORY", ResourceLoader.loadURL("fxml/ViewStory.fxml")).setBeanToNodeMapper(() -> createToggle("fas-eye", "View Stories")).setControllerFactory(c -> new ViewStoryController(this, stage)).get());
+        loader.addView(MFXLoaderBean.of("SETTINGS", ResourceLoader.loadURL("fxml/Settings.fxml")).setBeanToNodeMapper(() -> createToggle("fas-gear", "Settings")).get());
 
         // create the toggle buttons and add them to the navigation bar on the left side of the screen
         loader.setOnLoadedAction(beans -> {
@@ -116,7 +120,7 @@ public class EffortLoggerController implements Initializable {
                         if (bean.getViewName().equals("VIEW-STORY")) {
                             toggle.setOnAction(event -> {
                                 contentPane.getChildren().setAll(bean.getRoot());
-                                // TODO automatically fetch new list when button is pressed on view-story
+                                 viewStoryController.refreshTable();
                             });
                         } else {
                             toggle.setOnAction(event -> contentPane.getChildren().setAll(bean.getRoot()));
@@ -150,5 +154,13 @@ public class EffortLoggerController implements Initializable {
 
     public static Database getDatabase() {
         return database;
+    }
+
+    public ViewStoryController getViewStoryController() {
+        return viewStoryController;
+    }
+
+    public void setViewStoryController(ViewStoryController viewStoryController) {
+        this.viewStoryController = viewStoryController;
     }
 }
