@@ -190,6 +190,9 @@ public class UserStory {
 
     public long getRunningTimeInSeconds() {
         long diffInMillies = 0L;
+        if (dates == null)
+            return diffInMillies;
+
         ArrayList<Date> datesArray = getDatesArray();
 
         for (int i = 0; i < datesArray.size(); i += 2) {
@@ -201,8 +204,12 @@ public class UserStory {
     }
 
     public ArrayList<Date> getDatesArray() {
-        String[] datesAsString = dates.split(",");
+
         ArrayList<Date> datesArrayList = new ArrayList<>();
+        if (dates == null)
+            return datesArrayList;
+
+        String[] datesAsString = dates.split(",");
 
         for (String date : datesAsString) {
             if (date.isBlank())
