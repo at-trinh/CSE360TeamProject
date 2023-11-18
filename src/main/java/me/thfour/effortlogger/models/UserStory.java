@@ -1,5 +1,11 @@
 package me.thfour.effortlogger.models;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 public class UserStory {
     private int storyId;
     private String project;
@@ -132,5 +138,79 @@ public class UserStory {
 
     public String getDates() {
         return dates;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setPhase(String phase) {
+        this.phase = phase;
+    }
+
+    public void setEffortCategory(String effortCategory) {
+        this.effortCategory = effortCategory;
+    }
+
+    public void setDeliverable(String deliverable) {
+        this.deliverable = deliverable;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public void setStoryPoints(int storyPoints) {
+        this.storyPoints = storyPoints;
+    }
+
+    public void setDates(String dates) {
+        this.dates = dates;
+    }
+
+    public void setDefect(boolean defect) {
+        isDefect = defect;
+    }
+
+    public void setDefectCategory(String defectCategory) {
+        this.defectCategory = defectCategory;
+    }
+
+    public long getRunningTimeInSeconds() {
+        long diffInMillies = 0L;
+        ArrayList<Date> datesArray = getDatesArray();
+
+        for (int i = 0; i < datesArray.size(); i += 2) {
+            System.out.println(datesArray.get(i));
+            diffInMillies += datesArray.get(i+1).getTime() - datesArray.get(i).getTime();
+        }
+
+        return TimeUnit.SECONDS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+    }
+
+    public ArrayList<Date> getDatesArray() {
+        String[] datesAsString = dates.split(",");
+        ArrayList<Date> datesArrayList = new ArrayList<>();
+
+        for (String date : datesAsString) {
+            if (date.isBlank())
+                continue;
+
+            datesArrayList.add(new Date(date));
+        }
+
+        return datesArrayList;
     }
 }

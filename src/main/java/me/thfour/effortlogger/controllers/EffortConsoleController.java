@@ -3,7 +3,6 @@ package me.thfour.effortlogger.controllers;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
 import io.github.palexdev.materialfx.enums.ButtonType;
-import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 public class EffortConsoleController implements Initializable {
 
     @FXML
-    private MFXComboBox<UserStory> userStory;
+    private MFXComboBox<UserStory> userStorySelector;
 
     @FXML
     private VBox buttonVBox;
@@ -35,47 +34,55 @@ public class EffortConsoleController implements Initializable {
     private Label clockProgress;
 
     @FXML
-    private Label elapsedTimeLabel;
+    private Label totalElapsedTimeLabel;
+
+    @FXML
+    private Label sessionElapsedTimeLabel;
 
     @FXML
     private VBox clockStatusVBox;
 
-    private Long taskRunningTimeInSeconds;
+    private Long taskSessionRunningTimeInSeconds;
+    private Long taskTotalRunningTimeInSeconds;
     private Timeline taskTimeline;
-    private MFXButton startActivity;
+    private MFXButton startActivityButton;
+    private MFXButton pauseResumeActivityButton;
     private GridPane gridPane;
+
+    private EffortControllerState state = EffortControllerState.STOPPED;
+
+    public EffortConsoleController(EffortLoggerController effortLoggerController) {
+        effortLoggerController.setEffortConsoleController(this);
+    }
+
+    public EffortControllerState getState() {
+        return state;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        clockStatusVBox.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
-        startActivity = new MFXButton("Start Activity");
-        startActivity.setDisable(true);
-        startActivity.setMaxWidth(Double.MAX_VALUE);
-        startActivity.setButtonType(ButtonType.RAISED);
-        startActivity.setOnAction(e -> {
-            taskRunningTimeInSeconds = 0L;
-            taskTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-                taskRunningTimeInSeconds += 1;
-                long seconds = taskRunningTimeInSeconds % 60L;
-                long minutes = TimeUnit.SECONDS.toMinutes(taskRunningTimeInSeconds) % 60L;
-                long hours = TimeUnit.SECONDS.toHours(taskRunningTimeInSeconds);
-                elapsedTimeLabel.setText(String.format("%s:%s:%s", formatTimeNumber(hours), formatTimeNumber(minutes), formatTimeNumber(seconds)));
-            }));
-            taskTimeline.setCycleCount(Timeline.INDEFINITE);
-            taskTimeline.play();
-            clockProgress.setText("CLOCK IS RUNNING");
-            clockStatusVBox.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-            try {
-                EffortLoggerController.getDatabase().addDateToUserStory(userStory.getSelectedItem(), new Date(), "In Progress");
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
+        initUI();
+    }
 
-            buttonVBox.getChildren().setAll(gridPane);
-            userStory.setDisable(true);
+    private void initUI() {
+        updateClockLabel();
+        initSelectUI();
+        initSelectedUI();
+        initSelector();
+    }
+
+    private void initSelectUI() {
+        startActivityButton = new MFXButton("Start Activity");
+        startActivityButton.setDisable(true);
+        startActivityButton.setMaxWidth(Double.MAX_VALUE);
+        startActivityButton.setButtonType(ButtonType.RAISED);
+        startActivityButton.setOnAction(e -> {
+            startActivityAction();
         });
-        buttonVBox.getChildren().setAll(startActivity);
+        buttonVBox.getChildren().setAll(startActivityButton);
+    }
 
+    private void initSelectedUI() {
         gridPane = new GridPane();
         gridPane.setPadding(new Insets(10));
         gridPane.setHgap(5);
@@ -86,33 +93,15 @@ public class EffortConsoleController implements Initializable {
         col2.setHgrow(Priority.ALWAYS);
         gridPane.getColumnConstraints().addAll(col1, col2);
 
-        MFXButton pauseActivity = new MFXButton("Pause Activity");
-        pauseActivity.setMaxWidth(Double.MAX_VALUE);
-        pauseActivity.prefWidth(Double.MAX_VALUE);
-        pauseActivity.setButtonType(ButtonType.RAISED);
-        pauseActivity.setOnAction(e -> {
-            if (taskTimeline.getStatus().equals(Animation.Status.RUNNING)) {
-                taskTimeline.pause();
-                pauseActivity.setText("Resume Activity");
-                clockProgress.setText("CLOCK IS PAUSED");
-                clockStatusVBox.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
-                try {
-                    EffortLoggerController.getDatabase().addDateToUserStory(userStory.getSelectedItem(), new Date(), "In Progress");
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
-                userStory.setDisable(false);
+        pauseResumeActivityButton = new MFXButton("Pause Activity");
+        pauseResumeActivityButton.setMaxWidth(Double.MAX_VALUE);
+        pauseResumeActivityButton.prefWidth(Double.MAX_VALUE);
+        pauseResumeActivityButton.setButtonType(ButtonType.RAISED);
+        pauseResumeActivityButton.setOnAction(e -> {
+            if (state.equals(EffortControllerState.RUNNING)) {
+                pauseActivityAction();
             } else {
-                taskTimeline.play();
-                pauseActivity.setText("Pause Activity");
-                clockProgress.setText("CLOCK IS RUNNING");
-                clockStatusVBox.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-                try {
-                    EffortLoggerController.getDatabase().addDateToUserStory(userStory.getSelectedItem(), new Date(), "In Progress");
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
-                userStory.setDisable(true);
+                resumeActivityAction();
             }
         });
 
@@ -121,43 +110,144 @@ public class EffortConsoleController implements Initializable {
         finishActivity.prefWidth(Double.MAX_VALUE);
         finishActivity.setButtonType(ButtonType.RAISED);
         finishActivity.setOnAction(e -> {
-            if (taskTimeline.getStatus().equals(Animation.Status.RUNNING)) {
-                try {
-                    EffortLoggerController.getDatabase().addDateToUserStory(userStory.getSelectedItem(), new Date(), "Finished");
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
-            } else {
-                try {
-                    EffortLoggerController.getDatabase().setUserStoryStatus(userStory.getSelectedItem(), "Finished");
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-            taskTimeline.stop();
-            clockProgress.setText("CLOCK IS STOPPED");
-            clockStatusVBox.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
-            userStory.setDisable(false);
+            finishActivityAction();
         });
 
-        gridPane.add(pauseActivity, 0, 0);
+        gridPane.add(pauseResumeActivityButton, 0, 0);
         gridPane.add(finishActivity, 1, 0);
+    }
+
+    private void initSelector() {
+        refreshSelector();
+
+        userStorySelector.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+            startActivityButton.setDisable(false);
+            taskTotalRunningTimeInSeconds = newValue.getRunningTimeInSeconds();
+            taskSessionRunningTimeInSeconds = 0L;
+            totalElapsedTimeLabel.setText(getRunningTime(taskTotalRunningTimeInSeconds));
+            sessionElapsedTimeLabel.setText(getRunningTime(taskSessionRunningTimeInSeconds));
+            state = EffortControllerState.STOPPED;
+            updateClockLabel();
+        });
+    }
+
+    private void startActivityAction() {
+        this.state = EffortControllerState.RUNNING;
+        taskSessionRunningTimeInSeconds = 0L;
+
+        taskTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            taskSessionRunningTimeInSeconds += 1;
+            taskTotalRunningTimeInSeconds += 1;
+            sessionElapsedTimeLabel.setText(getRunningTime(taskSessionRunningTimeInSeconds));
+            totalElapsedTimeLabel.setText(getRunningTime(taskTotalRunningTimeInSeconds));
+        }));
+
+        taskTimeline.setCycleCount(Timeline.INDEFINITE);
+        taskTimeline.play();
+
+        updateClockLabel();
 
         try {
-            userStory.setItems(FXCollections.observableList(EffortLoggerController.getDatabase().getUserStories().stream().filter(userStory1 -> !userStory1.getStatus().equals("Finished")).collect(Collectors.toList())));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            EffortLoggerController.getDatabase().addDateToUserStory(userStorySelector.getSelectedItem(), new Date(), "In Progress");
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
         }
 
-        userStory.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
-            startActivity.setDisable(false);
-        });
+        buttonVBox.getChildren().setAll(gridPane);
+        userStorySelector.setDisable(true);
+    }
+
+    public void pauseActivityAction() {
+        state = EffortControllerState.PAUSED;
+        taskTimeline.pause();
+        pauseResumeActivityButton.setText("Resume Activity");
+        updateClockLabel();
+        try {
+            EffortLoggerController.getDatabase().addDateToUserStory(userStorySelector.getSelectedItem(), new Date(), "In Progress");
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+        userStorySelector.setDisable(false);
+    }
+
+    private void resumeActivityAction() {
+        state = EffortControllerState.RUNNING;
+        taskTimeline.play();
+        pauseResumeActivityButton.setText("Pause Activity");
+        taskSessionRunningTimeInSeconds = 0L;
+        updateClockLabel();
+        try {
+            EffortLoggerController.getDatabase().addDateToUserStory(userStorySelector.getSelectedItem(), new Date(), "In Progress");
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+        userStorySelector.setDisable(true);
+    }
+
+    public void finishActivityAction() {
+        if (state.equals(EffortControllerState.RUNNING)) {
+            try {
+                EffortLoggerController.getDatabase().addDateToUserStory(userStorySelector.getSelectedItem(), new Date(), "Finished");
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        } else {
+            try {
+                EffortLoggerController.getDatabase().setUserStoryStatus(userStorySelector.getSelectedItem(), "Finished");
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+
+        taskTimeline.stop();
+        state = EffortControllerState.STOPPED;
+        updateClockLabel();
+
+        userStorySelector.setDisable(false);
+    }
+
+    private void updateClockLabel() {
+        switch (state) {
+            case RUNNING:
+                clockProgress.setText("CLOCK IS RUNNING");
+                clockStatusVBox.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+                break;
+            case PAUSED:
+                clockProgress.setText("CLOCK IS PAUSED");
+                clockStatusVBox.setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+                break;
+            case STOPPED:
+                clockProgress.setText("CLOCK IS STOPPED");
+                clockStatusVBox.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+                break;
+        }
     }
 
     private String formatTimeNumber(long number) {
         if (number >= 10)
             return String.valueOf(number);
         else
-            return "0" + String.valueOf(number);
+            return "0" + number;
+    }
+
+    private String getRunningTime(long time) {
+        long seconds = time % 60L;
+        long minutes = TimeUnit.SECONDS.toMinutes(time) % 60L;
+        long hours = TimeUnit.SECONDS.toHours(time);
+        return String.format("%s:%s:%s", formatTimeNumber(hours), formatTimeNumber(minutes), formatTimeNumber(seconds));
+    }
+
+    public void refreshSelector() {
+        try {
+            userStorySelector.setItems(FXCollections.observableList(EffortLoggerController.getDatabase().getUserStories().stream().filter(userStory1 -> !userStory1.getStatus().equals("Finished")).collect(Collectors.toList())));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public enum EffortControllerState {
+        RUNNING,
+        PAUSED,
+        STOPPED
     }
 }

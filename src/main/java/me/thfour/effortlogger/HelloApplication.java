@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import me.thfour.effortlogger.controllers.EffortLoggerController;
 
 import java.io.IOException;
@@ -34,7 +35,7 @@ public class HelloApplication extends Application {
         // init window
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
-        //stage.initStyle(StageStyle.TRANSPARENT); // gets rid of system top bar
+        stage.initStyle(StageStyle.TRANSPARENT); // gets rid of system top bar
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
         stage.setTitle("EffortLogger 2.0");

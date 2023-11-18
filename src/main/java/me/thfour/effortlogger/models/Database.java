@@ -136,8 +136,13 @@ public class Database {
     }
 
     public void addDateToUserStory(UserStory story, Date date, String status) throws SQLException {
+        String dateString = date.toString();
+        if (!story.getDates().isBlank())
+            dateString = String.join(",", story.getDates(), dateString);
+
+        story.setDates(dateString);
         PreparedStatement ps = connection.prepareStatement("UPDATE USERSTORIES SET DATES=?, STATUS=? WHERE STORYID=?;");
-        ps.setString(1, date.toString());
+        ps.setString(1, dateString);
         ps.setString(2, status);
         ps.setInt(3, story.getStoryId());
         ps.executeUpdate();
