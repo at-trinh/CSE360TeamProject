@@ -5,6 +5,7 @@ import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
 import io.github.palexdev.materialfx.enums.ButtonType;
 import io.github.palexdev.materialfx.enums.FloatMode;
 import io.github.palexdev.materialfx.filter.StringFilter;
+import io.github.palexdev.materialfx.utils.ScrollUtils;
 import io.github.palexdev.materialfx.validation.Constraint;
 import io.github.palexdev.materialfx.validation.Severity;
 import javafx.collections.FXCollections;
@@ -44,7 +45,7 @@ public class PlanningPokerController implements Initializable {
     private MFXPaginatedTableView<UserStory> paginated;
 
     @FXML
-    private ScrollPane content;
+    private MFXScrollPane content;
 
     private final HashMap<MFXTextField, Label> fields = new HashMap<>();
     private int index = 0;
@@ -287,6 +288,8 @@ public class PlanningPokerController implements Initializable {
         vbox.getChildren().setAll(gridPane);
         content.setContent(vbox);
         content.setFitToWidth(true);
+        content.setMaxHeight(250);
+        ScrollUtils.addSmoothScrolling(content);
 
         fields.put(projectPair.getKey(), projectPair.getValue());
         fields.put(titlePair.getKey(), titlePair.getValue());
