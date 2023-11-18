@@ -42,8 +42,8 @@ public class EffortConsoleController implements Initializable {
     @FXML
     private VBox clockStatusVBox;
 
-    private Long taskSessionRunningTimeInSeconds;
-    private Long taskTotalRunningTimeInSeconds;
+    private Long taskSessionRunningTimeInSeconds = 0L;
+    private Long taskTotalRunningTimeInSeconds = 0L;
     private Timeline taskTimeline;
     private MFXButton startActivityButton;
     private MFXButton pauseResumeActivityButton;
