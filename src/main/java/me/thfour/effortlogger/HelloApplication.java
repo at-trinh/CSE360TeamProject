@@ -1,7 +1,8 @@
 package me.thfour.effortlogger;
 
-import io.github.palexdev.materialfx.css.themes.MFXThemeManager;
-import io.github.palexdev.materialfx.css.themes.Themes;
+import io.github.palexdev.materialfx.theming.JavaFXThemes;
+import io.github.palexdev.materialfx.theming.MaterialFXStylesheets;
+import io.github.palexdev.materialfx.theming.UserAgentBuilder;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,6 +19,14 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
         //CSSFX.start(); // ONLY UNCOMMENTED WHEN DEVELOPING. LEAVE COMMENTED FOR RELEASE OR THE PROGRAM WON'T WORK
 
+        UserAgentBuilder.builder()
+                .themes(JavaFXThemes.MODENA)
+                .themes(MaterialFXStylesheets.forAssemble(true))
+                .setDeploy(true)
+                .setResolveAssets(true)
+                .build()
+                .setGlobal();
+
         FXMLLoader fxmlLoader = new FXMLLoader(ResourceLoader.loadURL("fxml/EffortLogger.fxml")); // load main menu
         fxmlLoader.setControllerFactory(c -> new EffortLoggerController(stage)); // set controller for main menu. this
                                                                                 // controller dictates the control path
@@ -25,7 +34,6 @@ public class HelloApplication extends Application {
         // init window
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root);
-        MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY); // CAUSES MAJOR PERFORMANCE ISSUES
         //stage.initStyle(StageStyle.TRANSPARENT); // gets rid of system top bar
         scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
