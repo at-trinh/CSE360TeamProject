@@ -121,6 +121,9 @@ public class EffortConsoleController implements Initializable {
         refreshSelector();
 
         userStorySelector.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+            if (newValue == null)
+                return;
+
             startActivityButton.setDisable(false);
             taskTotalRunningTimeInSeconds = newValue.getRunningTimeInSeconds();
             taskSessionRunningTimeInSeconds = 0L;
@@ -202,6 +205,10 @@ public class EffortConsoleController implements Initializable {
         taskTimeline.stop();
         state = EffortControllerState.STOPPED;
         updateClockLabel();
+        userStorySelector.getItems().remove(userStorySelector.getSelectedItem());
+        userStorySelector.clearSelection();
+        startActivityButton.setDisable(true);
+        buttonVBox.getChildren().setAll(startActivityButton);
 
         userStorySelector.setDisable(false);
     }

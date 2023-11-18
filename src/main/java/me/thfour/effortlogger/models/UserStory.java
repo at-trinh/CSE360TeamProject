@@ -32,6 +32,8 @@ public class UserStory {
         this.storyPoints = storyPoints;
         this.isDefect = isDefect;
         this.defectCategory = defectCategory;
+        this.status = "Not Started";
+        this.dates = "";
     }
 
     public UserStory(int storyId, String project, String title, String phase, String effortCategory, String deliverable, String status, String description, String tags, int storyPoints, String dates, boolean isDefect, String defectCategory) {
@@ -137,6 +139,8 @@ public class UserStory {
     }
 
     public String getDates() {
+        if (dates == null)
+            return "";
         return dates;
     }
 
