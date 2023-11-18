@@ -31,13 +31,13 @@ public class Database {
                 "    EffortCategory VARCHAR(32) NOT NULL,\n" +
                 "    Deliverable VARCHAR(32) NOT NULL,\n" +
                 "    Status VARCHAR(32) NOT NULL DEFAULT 'Not Started',\n" +
-                "    Description VARCHAR(1000) NOT NULL,\n" +
+                "    Description VARCHAR(2000) NOT NULL,\n" +
                 "    Tags VARCHAR(32) NOT NULL,\n" +
                 "    StoryPoints TINYINT NOT NULL,\n" +
                 "    IsDefect BIT NOT NULL,\n" +
                 "    DefectCategory VARCHAR(32) NOT NULL,\n" +
                 "    DateCreated VARCHAR(32) NOT NULL,\n" +
-                "    Dates VARCHAR(200)\n" +
+                "    Dates VARCHAR(2000)\n" +
                 ");");
         ps.executeUpdate();
         ps.close();
