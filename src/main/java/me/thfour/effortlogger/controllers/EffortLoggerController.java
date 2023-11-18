@@ -7,6 +7,7 @@ import io.github.palexdev.materialfx.controls.MFXScrollPane;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
 import io.github.palexdev.materialfx.dialogs.MFXGenericDialogBuilder;
 import io.github.palexdev.materialfx.dialogs.MFXStageDialog;
+import io.github.palexdev.materialfx.enums.ButtonType;
 import io.github.palexdev.materialfx.enums.ScrimPriority;
 import io.github.palexdev.materialfx.utils.ScrollUtils;
 import io.github.palexdev.materialfx.utils.ToggleButtonsUtil;
@@ -143,9 +144,11 @@ public class EffortLoggerController implements Initializable {
         final ColumnConstraints col2 = new ColumnConstraints();
         col2.setHgrow(Priority.ALWAYS);
         gridPane.getColumnConstraints().addAll(col1, col2);
+        gridPane.setVgap(30);
 
         MFXButton pauseButton = new MFXButton("Pause Activity");
         pauseButton.setStyle("-fx-background-color: -mfx-orange; -fx-text-fill: white;");
+        pauseButton.setButtonType(ButtonType.RAISED);
         pauseButton.setOnAction(e -> {
             effortConsoleController.pauseActivityAction();
             Platform.exit();
@@ -155,6 +158,7 @@ public class EffortLoggerController implements Initializable {
 
         MFXButton finishButton = new MFXButton("Finish Activity");
         finishButton.setStyle("-fx-background-color: -mfx-green; -fx-text-fill: white;");
+        finishButton.setButtonType(ButtonType.RAISED);
         finishButton.setOnAction(e -> {
             effortConsoleController.finishActivityAction();
             Platform.exit();
