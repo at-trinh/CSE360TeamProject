@@ -10,7 +10,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import me.thfour.effortlogger.HelloApplication;
+import me.thfour.effortlogger.MainApplication;
 import me.thfour.effortlogger.ResourceLoader;
 
 import java.io.IOException;
@@ -37,6 +37,7 @@ public class SplashScreenController implements Initializable {
                 throw new RuntimeException(e);
             }
 
+            // make main application UI
             Platform.runLater(() -> {
                 Stage stage = new Stage();
                 FXMLLoader fxmlLoader = new FXMLLoader(ResourceLoader.loadURL("fxml/EffortLogger.fxml")); // load main menu
@@ -56,7 +57,7 @@ public class SplashScreenController implements Initializable {
                 stage.setScene(scene);
                 stage.setTitle("EffortLogger 2.0");
                 stage.show();
-                HelloApplication.getApplication().killSplashScreen();
+                MainApplication.getApplication().killSplashScreen();
             });
         }
     }

@@ -119,6 +119,7 @@ public class EffortLoggerController implements Initializable {
             stage.setAlwaysOnTop(newVal);
         });
 
+        // make borderless window draggable
         windowHeader.setOnMousePressed(event -> {
             xOffset = stage.getX() - event.getScreenX();
             yOffset = stage.getY() - event.getScreenY();

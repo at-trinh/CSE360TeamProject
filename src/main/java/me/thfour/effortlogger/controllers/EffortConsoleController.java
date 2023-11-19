@@ -132,6 +132,7 @@ public class EffortConsoleController implements Initializable {
             if (newValue == null)
                 return;
 
+            // when a user story is selected so we should get the time spent on that story and make sure they can interact with the UI
             startActivityButton.setDisable(false);
             taskTotalRunningTimeInSeconds = newValue.getRunningTimeInSeconds();
             taskSessionRunningTimeInSeconds = 0L;

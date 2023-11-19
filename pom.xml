@@ -12,7 +12,7 @@
     <description>The best EffortLogger known to man</description>
 
     <properties>
-        <main-class>me.thfour.effortlogger.HelloApplication</main-class>
+        <main-class>me.thfour.effortlogger.MainApplication</main-class>
         <app.name>EffortLogger</app.name>
         <app.version>1.1.0</app.version>
         <jvm.modules>javafx.controls,javafx.fxml,java.sql</jvm.modules>

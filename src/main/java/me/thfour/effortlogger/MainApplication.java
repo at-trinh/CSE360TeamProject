@@ -12,9 +12,9 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
-public class HelloApplication extends Application {
+public class MainApplication extends Application {
 
-    private static HelloApplication application;
+    private static MainApplication application;
     private Stage stage;
 
     @Override
@@ -23,6 +23,7 @@ public class HelloApplication extends Application {
         application = this;
         this.stage = stage;
 
+        // CSS Themeing
         UserAgentBuilder.builder()
                 .themes(JavaFXThemes.MODENA)
                 .themes(MaterialFXStylesheets.forAssemble(true))
@@ -39,7 +40,7 @@ public class HelloApplication extends Application {
         stage.show();
     }
 
-    public static HelloApplication getApplication() {
+    public static MainApplication getApplication() {
         return application;
     }
 

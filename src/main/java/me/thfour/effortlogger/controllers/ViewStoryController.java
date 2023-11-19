@@ -498,6 +498,8 @@ public class ViewStoryController implements Initializable {
     }
 
     private void registerRowEvents() {
+        // context menu and double mouse click events
+
         MFXContextMenuItem deleteItem = MFXContextMenuItem.Builder.build().setIcon(new MFXFontIcon("fas-delete-left", 16)).setText("Delete entry").setOnAction(e -> {
             try {
                 deleteUserStory(viewStoryTable.getSelectionModel().getSelectedValue());
@@ -601,6 +603,8 @@ public class ViewStoryController implements Initializable {
     }
 
     private void registerTableEvents() {
+
+        // Keyboard events
         viewStoryTable.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.DELETE) {
                 try {
