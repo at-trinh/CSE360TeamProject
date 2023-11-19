@@ -7,18 +7,21 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import me.thfour.effortlogger.controllers.EffortLoggerController;
 
 import java.io.IOException;
 
 public class HelloApplication extends Application {
 
+    private static HelloApplication application;
+    private Stage stage;
+
     @Override
     public void start(Stage stage) throws IOException {
         //CSSFX.start(); // ONLY UNCOMMENTED WHEN DEVELOPING. LEAVE COMMENTED FOR RELEASE OR THE PROGRAM WON'T WORK
+        application = this;
+        this.stage = stage;
 
         UserAgentBuilder.builder()
                 .themes(JavaFXThemes.MODENA)
@@ -28,18 +31,20 @@ public class HelloApplication extends Application {
                 .build()
                 .setGlobal();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(ResourceLoader.loadURL("fxml/EffortLogger.fxml")); // load main menu
-        fxmlLoader.setControllerFactory(c -> new EffortLoggerController(stage)); // set controller for main menu. this
-                                                                                // controller dictates the control path
-                                                                                // for the entire program
-        // init window
-        Parent root = fxmlLoader.load();
+        Parent root = FXMLLoader.load(ResourceLoader.loadURL("fxml/SplashScreen.fxml"));
         Scene scene = new Scene(root);
-        stage.initStyle(StageStyle.TRANSPARENT); // gets rid of system top bar
-        scene.setFill(Color.TRANSPARENT);
         stage.setScene(scene);
+        stage.initStyle(StageStyle.UNDECORATED); // gets rid of system top bar
         stage.setTitle("EffortLogger 2.0");
         stage.show();
+    }
+
+    public static HelloApplication getApplication() {
+        return application;
+    }
+
+    public void killSplashScreen() {
+        this.stage.close();
     }
 
     public static void main(String[] args) {

@@ -36,6 +36,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 public class EffortLoggerController implements Initializable {
 
@@ -232,6 +233,7 @@ public class EffortLoggerController implements Initializable {
                     }).toList();
             navBar.getChildren().setAll(nodes);
         });
+
         loader.start();
     }
 

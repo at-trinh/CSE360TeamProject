@@ -69,6 +69,14 @@ public class EffortConsoleController implements Initializable {
         initSelectUI();
         initSelectedUI();
         initSelector();
+        taskTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            taskSessionRunningTimeInSeconds += 1;
+            taskTotalRunningTimeInSeconds += 1;
+            sessionElapsedTimeLabel.setText(getRunningTime(taskSessionRunningTimeInSeconds));
+            totalElapsedTimeLabel.setText(getRunningTime(taskTotalRunningTimeInSeconds));
+        }));
+
+        taskTimeline.setCycleCount(Timeline.INDEFINITE);
     }
 
     private void initSelectUI() {
@@ -138,14 +146,6 @@ public class EffortConsoleController implements Initializable {
         this.state = EffortControllerState.RUNNING;
         taskSessionRunningTimeInSeconds = 0L;
 
-        taskTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-            taskSessionRunningTimeInSeconds += 1;
-            taskTotalRunningTimeInSeconds += 1;
-            sessionElapsedTimeLabel.setText(getRunningTime(taskSessionRunningTimeInSeconds));
-            totalElapsedTimeLabel.setText(getRunningTime(taskTotalRunningTimeInSeconds));
-        }));
-
-        taskTimeline.setCycleCount(Timeline.INDEFINITE);
         taskTimeline.play();
 
         updateClockLabel();
