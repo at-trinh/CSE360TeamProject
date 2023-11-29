@@ -382,6 +382,12 @@ public class PlanningPokerController implements Initializable {
                 throw new RuntimeException(e);
             }
         }
+
+        // reset state
+        userStories.clear();
+        index = 0;
+        resetState();
+        previousButton.setDisable(true);
     }
 
     @FXML
